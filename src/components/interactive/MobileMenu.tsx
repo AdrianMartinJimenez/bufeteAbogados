@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NavItem {
   titulo: string;
@@ -18,6 +18,27 @@ export default function MobileMenu({ servicios, sectores }: Props) {
   const toggle = () => setIsOpen((v) => !v);
   const toggleSection = (section: string) =>
     setOpenSection((v) => (v === section ? null : section));
+
+  // Conectar con el botón hamburger del Header
+  useEffect(() => {
+    const btn = document.getElementById('mobile-menu-btn');
+    if (!btn) return;
+    const handleClick = () => setIsOpen(true);
+    btn.addEventListener('click', handleClick);
+    return () => btn.removeEventListener('click', handleClick);
+  }, []);
+
+  // Sincronizar aria-expanded del botón header
+  useEffect(() => {
+    const btn = document.getElementById('mobile-menu-btn');
+    if (btn) btn.setAttribute('aria-expanded', String(isOpen));
+  }, [isOpen]);
+
+  // Bloquear scroll del body cuando el menú está abierto
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   return (
     <>

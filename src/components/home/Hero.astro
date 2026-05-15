@@ -27,15 +27,15 @@ const { titulo, subtitulos = [], descripcion, ctaTexto, ctaEnlace, imagenUrl } =
   <div class="absolute inset-0 bg-black/60"></div>
 
   <!-- Content -->
-  <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-32">
+  <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-20 lg:py-32">
     <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.25em] mb-6" id="hero-eyebrow">
       {subtitulos[0] ?? ''}
     </p>
-    <h1 class="font-serif text-5xl sm:text-6xl lg:text-8xl text-white font-light leading-[1.05] max-w-4xl mb-8">
+    <h1 class="font-serif text-4xl sm:text-6xl lg:text-8xl text-white font-light leading-[1.05] max-w-4xl mb-8">
       {titulo}
     </h1>
     {descripcion && (
-      <p class="text-white/70 font-sans text-lg max-w-xl leading-relaxed mb-12">{descripcion}</p>
+      <p class="text-white/70 font-sans text-base lg:text-lg max-w-xl leading-relaxed mb-10 lg:mb-12">{descripcion}</p>
     )}
     {ctaTexto && ctaEnlace && (
       <a

@@ -9,7 +9,7 @@ interface Props {
 
 const { titulo, slug, descripcionCorta, icono } = Astro.props;
 ---
-<a href={`/servicios/${slug}`} class="group block card-gold-top border border-firm-border p-8 transition-colors hover:border-firm-gold/40 relative">
+<a href={`/servicios/${slug}`} class="group block card-gold-top border border-firm-border p-6 lg:p-8 transition-colors hover:border-firm-gold/40 relative">
   {icono && (
     <span class="font-serif text-5xl text-firm-muted/30 block mb-4 transition-colors group-hover:text-firm-gold/40" aria-hidden="true">
       {icono}
