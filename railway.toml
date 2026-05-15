@@ -4,5 +4,3 @@ buildCommand = "npm run build"
 
 [deploy]
 startCommand = "node dist/server/entry.mjs"
-restartPolicyType = "on-failure"
-restartPolicyMaxRetries = 3
