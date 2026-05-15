@@ -43,7 +43,7 @@ const categorias = await getCategorias();
           />
         ))}
       </div>
-      <Pagination currentPage={page} totalPages={totalPages} baseUrl="/conocimiento" />
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl="/conocimiento/pagina" firstPageUrl="/conocimiento" />
     </>
   )}
 </PageLayout>

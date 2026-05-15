@@ -3,13 +3,14 @@ interface Props {
   currentPage: number;
   totalPages: number;
   baseUrl: string;
+  firstPageUrl?: string;
 }
 
-const { currentPage, totalPages, baseUrl } = Astro.props;
+const { currentPage, totalPages, baseUrl, firstPageUrl = baseUrl } = Astro.props;
 if (totalPages <= 1) return;
 
 const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-const prev = currentPage > 1 ? (currentPage === 2 ? baseUrl : `${baseUrl}/${currentPage - 1}`) : null;
+const prev = currentPage > 1 ? (currentPage === 2 ? firstPageUrl : `${baseUrl}/${currentPage - 1}`) : null;
 const next = currentPage < totalPages ? `${baseUrl}/${currentPage + 1}` : null;
 ---
 <nav aria-label="Paginación" class="flex items-center justify-center gap-2 py-12">
@@ -24,7 +25,7 @@ const next = currentPage < totalPages ? `${baseUrl}/${currentPage + 1}` : null;
   )}
 
   {pages.map((p) => {
-    const href = p === 1 ? baseUrl : `${baseUrl}/${p}`;
+    const href = p === 1 ? firstPageUrl : `${baseUrl}/${p}`;
     return (
       <a
         href={href}

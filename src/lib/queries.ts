@@ -253,6 +253,31 @@ export async function deleteNoticia(id: number) {
   await db.execute({ sql: 'DELETE FROM noticias WHERE id = ?', args: [id] });
 }
 
+// ── DESTACADOS HOME ────────────────────────────────────────────────────────
+export async function getServiciosDestacados(limit = 3) {
+  const { rows: rs } = await db.execute({
+    sql: 'SELECT id,titulo,slug,descripcion_corta,icono,imagen_url FROM servicios WHERE destacado=1 ORDER BY orden ASC LIMIT ?',
+    args: [limit],
+  });
+  return rows(rs);
+}
+
+export async function getSectoresDestacados(limit = 3) {
+  const { rows: rs } = await db.execute({
+    sql: 'SELECT id,titulo,slug,descripcion_corta,imagen_url,color_acento FROM sectores ORDER BY orden ASC LIMIT ?',
+    args: [limit],
+  });
+  return rows(rs);
+}
+
+export async function getEquipoDestacado(limit = 3) {
+  const { rows: rs } = await db.execute({
+    sql: 'SELECT id,nombre,slug,cargo,categoria,foto_url,especialidades FROM miembros WHERE mostrar_en_home=1 AND activo=1 ORDER BY orden ASC LIMIT ?',
+    args: [limit],
+  });
+  return rows(rs);
+}
+
 // ── USUARIOS ───────────────────────────────────────────────────────────────
 export async function getUserByEmail(email: string) {
   const { rows: rs } = await db.execute({ sql: 'SELECT * FROM usuarios WHERE email=? AND activo=1', args: [email] });

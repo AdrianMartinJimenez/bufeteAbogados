@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS configuracion (
   seo_titulo TEXT,
   seo_descripcion TEXT,
   seo_imagen_url TEXT,
+  servicios_destacados TEXT DEFAULT '[]',
+  sectores_destacados TEXT DEFAULT '[]',
+  equipo_destacado TEXT DEFAULT '[]',
   updated_at TEXT DEFAULT (datetime('now'))
 );
 

@@ -8,10 +8,15 @@ import TeamHighlight from '@/components/home/TeamHighlight.astro';
 import KnowledgeHighlight from '@/components/home/KnowledgeHighlight.astro';
 import BadgesSection from '@/components/home/BadgesSection.astro';
 import CtaSection from '@/components/home/CtaSection.astro';
-import { getConfiguracion, getArticulosRecientes } from '@/lib/queries';
+import { getConfiguracion, getArticulosRecientes, getServiciosDestacados, getSectoresDestacados, getEquipoDestacado } from '@/lib/queries';
 
 const config = await getConfiguracion();
-const articulos = await getArticulosRecientes(3);
+const [articulos, serviciosDestacados, sectoresDestacados, equipoDestacado] = await Promise.all([
+  getArticulosRecientes(3),
+  getServiciosDestacados(3),
+  getSectoresDestacados(3),
+  getEquipoDestacado(3),
+]);
 ---
 <BaseLayout
   seo={{
@@ -37,24 +42,24 @@ const articulos = await getArticulosRecientes(3);
     imagenUrl={config?.sobreImagen?.url}
   />
 
-  {config?.serviciosDestacados?.length > 0 && (
+  {serviciosDestacados.length > 0 && (
     <ServicesHighlight
-      titulo={config!.serviciosTitulo}
-      servicios={config!.serviciosDestacados}
+      titulo={config?.serviciosTitulo}
+      servicios={serviciosDestacados}
     />
   )}
 
-  {config?.sectoresDestacados?.length > 0 && (
+  {sectoresDestacados.length > 0 && (
     <SectorsHighlight
-      titulo={config!.sectoresTitulo}
-      sectores={config!.sectoresDestacados}
+      titulo={config?.sectoresTitulo}
+      sectores={sectoresDestacados}
     />
   )}
 
-  {config?.equipoDestacado?.length > 0 && (
+  {equipoDestacado.length > 0 && (
     <TeamHighlight
-      titulo={config!.equipoTitulo}
-      miembros={config!.equipoDestacado}
+      titulo={config?.equipoTitulo}
+      miembros={equipoDestacado}
     />
   )}
 
