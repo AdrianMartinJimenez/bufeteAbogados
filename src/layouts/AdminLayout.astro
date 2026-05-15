@@ -1,0 +1,129 @@
+---
+import { getConfiguracion } from '../lib/queries';
+
+const config = await getConfiguracion();
+const { user } = Astro.locals;
+
+const navItems = [
+  { href: '/admin', label: 'Dashboard', icon: '▦' },
+  { href: '/admin/configuracion', label: 'Configuración', icon: '⚙' },
+  { href: '/admin/servicios', label: 'Servicios', icon: '◈' },
+  { href: '/admin/sectores', label: 'Sectores', icon: '◉' },
+  { href: '/admin/equipo', label: 'Equipo', icon: '◎' },
+  { href: '/admin/articulos', label: 'Artículos', icon: '◷' },
+  { href: '/admin/noticias', label: 'Noticias', icon: '◻' },
+];
+
+const currentPath = new URL(Astro.request.url).pathname;
+function isActive(href: string) {
+  if (href === '/admin') return currentPath === '/admin';
+  return currentPath.startsWith(href);
+}
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: 'Inter', sans-serif; background: #F8F7F4; }
+    body { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px; flex-shrink: 0;
+      background: #0A0A0A; color: #F8F7F4;
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+    }
+    .sidebar-logo {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: #C9A84C;
+    }
+    .sidebar-logo span { display: block; font-size: 0.65rem; color: rgba(248,247,244,0.4); margin-top: 0.2rem; text-transform: none; letter-spacing: normal; }
+    .sidebar-nav { flex: 1; padding: 1.5rem 0; overflow-y: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.625rem 1.5rem;
+      color: rgba(248,247,244,0.6);
+      text-decoration: none; font-size: 0.8125rem; font-weight: 400;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-item:hover { color: #F8F7F4; background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: #C9A84C; background: rgba(201,168,76,0.08); }
+    .nav-icon { font-size: 0.875rem; width: 1rem; text-align: center; }
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.75rem; color: rgba(248,247,244,0.4);
+    }
+    .sidebar-footer a {
+      display: block; margin-top: 0.5rem;
+      color: rgba(248,247,244,0.4); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .sidebar-footer a:hover { color: #F8F7F4; }
+
+    /* Main content */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      background: #fff; border-bottom: 1px solid #E2E0DB;
+      padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 500; color: #0A0A0A; }
+    .topbar-user { font-size: 0.75rem; color: #6B6B6B; }
+    .content { flex: 1; padding: 2rem; max-width: 1200px; }
+
+    /* Forms & tables global overrides */
+    input, textarea, select {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+    }
+  </style>
+  <slot name="head" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      {config?.nombreSitio ?? 'Bufete'}
+      <span>Panel de administración</span>
+    </div>
+    <nav class="sidebar-nav">
+      {navItems.map(item => (
+        <a href={item.href} class={`nav-item ${isActive(item.href) ? 'active' : ''}`}>
+          <span class="nav-icon">{item.icon}</span>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    <div class="sidebar-footer">
+      <span>{user?.email}</span>
+      <a href="/admin/logout">Cerrar sesión →</a>
+      <a href="/" target="_blank" style="margin-top:0.25rem;">Ver sitio ↗</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title">{title}</span>
+      <span class="topbar-user">{user?.email}</span>
+    </div>
+    <div class="content">
+      <slot />
+    </div>
+  </main>
+</body>
+</html>

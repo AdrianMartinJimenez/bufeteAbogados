@@ -1,0 +1,56 @@
+---
+interface Badge {
+  imagenUrl?: string;
+  titulo?: string;
+  enlace?: string;
+}
+
+interface Props {
+  titulo?: string;
+  badges: Badge[];
+}
+
+const { titulo = 'Reconocimientos', badges = [] } = Astro.props;
+---
+{badges.length > 0 && (
+  <section class="py-20 bg-firm-black border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+      <p class="text-center text-white/30 text-xs font-sans uppercase tracking-[0.25em] mb-12">{titulo}</p>
+      <div class="flex flex-wrap items-center justify-center gap-10 lg:gap-16">
+        {badges.map((b) => (
+          <div>
+            {b.enlace ? (
+              <a href={b.enlace} target="_blank" rel="noopener noreferrer" aria-label={b.titulo}>
+                {b.imagenUrl ? (
+                  <img
+                    src={`${b.imagenUrl}?w=160&h=80&fit=max&auto=format`}
+                    alt={b.titulo ?? 'Reconocimiento'}
+                    class="h-12 lg:h-16 w-auto object-contain grayscale opacity-50 hover:opacity-90 hover:grayscale-0 transition-all duration-300"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="text-white/40 font-sans text-sm">{b.titulo}</span>
+                )}
+              </a>
+            ) : (
+              <>
+                {b.imagenUrl ? (
+                  <img
+                    src={`${b.imagenUrl}?w=160&h=80&fit=max&auto=format`}
+                    alt={b.titulo ?? 'Reconocimiento'}
+                    class="h-12 lg:h-16 w-auto object-contain grayscale opacity-50"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="text-white/40 font-sans text-sm">{b.titulo}</span>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

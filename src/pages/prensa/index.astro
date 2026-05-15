@@ -1,0 +1,30 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ArticleCard from '@/components/ui/ArticleCard.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import { getNoticias } from '@/lib/queries';
+
+const page = 1;
+const { items, totalPages } = await getNoticias(page);
+---
+<PageLayout titulo="Sala de prensa" subtitulo="Prensa">
+  {items.length === 0 ? (
+    <p class="text-firm-muted font-sans">No hay noticias publicadas aún.</p>
+  ) : (
+    <>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+        {items.map((n: any) => (
+          <ArticleCard
+            titulo={n.titulo}
+            slug={n.slug}
+            fechaPublicacion={n.fechaPublicacion}
+            extracto={n.extracto}
+            imagenUrl={n.imagenUrl}
+            tipo="noticia"
+          />
+        ))}
+      </div>
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl="/prensa" />
+    </>
+  )}
+</PageLayout>

@@ -1,0 +1,53 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+if (totalPages <= 1) return;
+
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+const prev = currentPage > 1 ? (currentPage === 2 ? baseUrl : `${baseUrl}/${currentPage - 1}`) : null;
+const next = currentPage < totalPages ? `${baseUrl}/${currentPage + 1}` : null;
+---
+<nav aria-label="Paginación" class="flex items-center justify-center gap-2 py-12">
+  {prev ? (
+    <a href={prev} class="px-4 py-2 text-sm font-sans border border-firm-border hover:border-firm-gold hover:text-firm-gold transition-colors" aria-label="Página anterior">
+      ← Anterior
+    </a>
+  ) : (
+    <span class="px-4 py-2 text-sm font-sans text-firm-muted/40 border border-firm-border/40 cursor-not-allowed">
+      ← Anterior
+    </span>
+  )}
+
+  {pages.map((p) => {
+    const href = p === 1 ? baseUrl : `${baseUrl}/${p}`;
+    return (
+      <a
+        href={href}
+        aria-current={p === currentPage ? 'page' : undefined}
+        class:list={[
+          'w-10 h-10 flex items-center justify-center text-sm font-sans border transition-colors',
+          p === currentPage
+            ? 'border-firm-black bg-firm-black text-firm-white'
+            : 'border-firm-border hover:border-firm-gold hover:text-firm-gold',
+        ]}
+      >
+        {p}
+      </a>
+    );
+  })}
+
+  {next ? (
+    <a href={next} class="px-4 py-2 text-sm font-sans border border-firm-border hover:border-firm-gold hover:text-firm-gold transition-colors" aria-label="Página siguiente">
+      Siguiente →
+    </a>
+  ) : (
+    <span class="px-4 py-2 text-sm font-sans text-firm-muted/40 border border-firm-border/40 cursor-not-allowed">
+      Siguiente →
+    </span>
+  )}
+</nav>

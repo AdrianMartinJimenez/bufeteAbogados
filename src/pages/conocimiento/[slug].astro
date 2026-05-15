@@ -1,0 +1,41 @@
+---
+import ArticleLayout from '@/layouts/ArticleLayout.astro';
+import PortableText from '@/components/ui/PortableText.astro';
+import ArticleCard from '@/components/ui/ArticleCard.astro';
+import { getArticuloBySlug } from '@/lib/queries';
+
+const { slug } = Astro.params;
+const articulo = await getArticuloBySlug(slug!);
+
+if (!articulo) return Astro.redirect('/conocimiento', 301);
+---
+<ArticleLayout
+  titulo={articulo.titulo}
+  fechaPublicacion={articulo.fechaPublicacion}
+  categorias={articulo.categorias}
+  imagenUrl={articulo.imagenUrl}
+  imagenAlt={articulo.imagenAlt}
+  autor={articulo.autor}
+  seo={{ titulo: articulo.seoTitulo ?? articulo.titulo, descripcion: articulo.seoDescripcion ?? articulo.extracto, imagen: articulo.imagenUrl }}
+>
+  {articulo.contenido && <PortableText content={articulo.contenido} />}
+
+  {articulo.articulosRelacionados?.length > 0 && (
+    <Fragment slot="relacionados">
+      <div class="mt-16 pt-8 border-t border-firm-border">
+        <p class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted mb-8">Artículos relacionados</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {articulo.articulosRelacionados.map((r: any) => (
+            <ArticleCard
+              titulo={r.titulo}
+              slug={r.slug}
+              fechaPublicacion={r.fechaPublicacion}
+              extracto={r.extracto}
+              imagenUrl={r.imagenUrl}
+            />
+          ))}
+        </div>
+      </div>
+    </Fragment>
+  )}
+</ArticleLayout>

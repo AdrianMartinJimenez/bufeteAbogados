@@ -1,0 +1,55 @@
+---
+import ArticleLayout from '@/layouts/ArticleLayout.astro';
+import PortableText from '@/components/ui/PortableText.astro';
+import ArticleCard from '@/components/ui/ArticleCard.astro';
+import { getNoticiaBySlug } from '@/lib/queries';
+
+const { slug } = Astro.params;
+const noticia = await getNoticiaBySlug(slug!);
+
+if (!noticia) return Astro.redirect('/prensa', 301);
+---
+<ArticleLayout
+  titulo={noticia.titulo}
+  fechaPublicacion={noticia.fechaPublicacion}
+  imagenUrl={noticia.imagenUrl}
+  imagenAlt={noticia.imagenAlt}
+  fuenteExterna={noticia.fuenteExterna}
+  seo={{ titulo: noticia.seoTitulo ?? noticia.titulo, descripcion: noticia.seoDescripcion ?? noticia.extracto, imagen: noticia.imagenUrl }}
+>
+  {noticia.enlaceExterno && (
+    <div class="mb-8 p-4 border border-firm-border bg-firm-white">
+      <p class="text-xs font-sans text-firm-muted mb-2">Noticia publicada en {noticia.fuenteExterna}</p>
+      <a
+        href={noticia.enlaceExterno}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-firm-gold text-sm font-sans hover:underline"
+      >
+        Leer artículo original →
+      </a>
+    </div>
+  )}
+
+  {noticia.contenido && <PortableText content={noticia.contenido} />}
+
+  {noticia.noticiasRelacionadas?.length > 0 && (
+    <Fragment slot="relacionados">
+      <div class="mt-16 pt-8 border-t border-firm-border">
+        <p class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted mb-8">Más noticias</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {noticia.noticiasRelacionadas.map((r: any) => (
+            <ArticleCard
+              titulo={r.titulo}
+              slug={r.slug}
+              fechaPublicacion={r.fechaPublicacion}
+              extracto={r.extracto}
+              imagenUrl={r.imagenUrl}
+              tipo="noticia"
+            />
+          ))}
+        </div>
+      </div>
+    </Fragment>
+  )}
+</ArticleLayout>

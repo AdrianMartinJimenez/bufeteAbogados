@@ -1,0 +1,33 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  seo?: {
+    titulo?: string;
+    descripcion?: string;
+    imagen?: string;
+  };
+}
+
+const { titulo, subtitulo, seo } = Astro.props;
+---
+<BaseLayout seo={seo ?? { titulo }}>
+  <!-- Cabecera de página -->
+  <section class="bg-firm-black text-firm-white py-24 lg:py-32">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+      <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.2em] mb-4">
+        {subtitulo ?? ''}
+      </p>
+      <h1 class="font-serif text-5xl lg:text-7xl font-light leading-tight">
+        {titulo}
+      </h1>
+    </div>
+  </section>
+
+  <!-- Contenido -->
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
+    <slot />
+  </div>
+</BaseLayout>

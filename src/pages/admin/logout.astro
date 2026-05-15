@@ -1,0 +1,6 @@
+---
+import { clearCookie } from '../../lib/auth';
+
+Astro.response.headers.set('Set-Cookie', clearCookie());
+return Astro.redirect('/admin/login');
+---

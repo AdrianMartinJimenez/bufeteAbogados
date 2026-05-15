@@ -1,0 +1,84 @@
+---
+interface Props {
+  titulo: string;
+  subtitulos: string[];
+  descripcion?: string;
+  ctaTexto?: string;
+  ctaEnlace?: string;
+  imagenUrl?: string;
+}
+
+const { titulo, subtitulos = [], descripcion, ctaTexto, ctaEnlace, imagenUrl } = Astro.props;
+---
+<section class="relative min-h-screen flex items-center overflow-hidden" aria-label="Hero">
+  {imagenUrl ? (
+    <img
+      src={`${imagenUrl}?w=1600&h=900&fit=crop&auto=format&fm=webp`}
+      alt=""
+      role="presentation"
+      class="absolute inset-0 w-full h-full object-cover"
+      loading="eager"
+      fetchpriority="high"
+    />
+  ) : (
+    <div class="absolute inset-0 bg-firm-black"></div>
+  )}
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/60"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-32">
+    <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.25em] mb-6" id="hero-eyebrow">
+      {subtitulos[0] ?? ''}
+    </p>
+    <h1 class="font-serif text-5xl sm:text-6xl lg:text-8xl text-white font-light leading-[1.05] max-w-4xl mb-8">
+      {titulo}
+    </h1>
+    {descripcion && (
+      <p class="text-white/70 font-sans text-lg max-w-xl leading-relaxed mb-12">{descripcion}</p>
+    )}
+    {ctaTexto && ctaEnlace && (
+      <a
+        href={ctaEnlace}
+        class="inline-flex items-center gap-3 border border-white/40 text-white text-xs font-sans uppercase tracking-[0.2em] px-8 py-4 hover:bg-white hover:text-firm-black transition-all duration-300"
+      >
+        {ctaTexto}
+        <span aria-hidden="true">→</span>
+      </a>
+    )}
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40" aria-hidden="true">
+    <span class="text-[10px] font-sans uppercase tracking-[0.2em]">Scroll</span>
+    <div class="w-px h-12 bg-white/20 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-4 bg-firm-gold animate-bounce-slow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Rotación de subtítulos con Motion One -->
+{subtitulos.length > 1 && (
+  <script>
+    import { animate, stagger } from '@motionone/dom';
+    let current = 0;
+    const el = document.getElementById('hero-eyebrow');
+    const subtitulos = JSON.parse(document.currentScript?.dataset.subtitulos ?? '[]');
+    if (el && subtitulos.length > 1) {
+      setInterval(async () => {
+        current = (current + 1) % subtitulos.length;
+        await animate(el, { opacity: 0, y: -8 }, { duration: 0.3 }).finished;
+        el.textContent = subtitulos[current];
+        animate(el, { opacity: 1, y: 0 }, { duration: 0.3 });
+      }, 3000);
+    }
+  </script>
+)}
+
+<style>
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(200%); }
+  }
+  .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
+</style>

@@ -1,0 +1,45 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import PortableText from '@/components/ui/PortableText.astro';
+import CtaSection from '@/components/home/CtaSection.astro';
+import { getServicioBySlug } from '@/lib/queries';
+
+const { slug } = Astro.params;
+const servicio = await getServicioBySlug(slug!);
+
+if (!servicio) return Astro.redirect('/servicios', 301);
+---
+<PageLayout
+  titulo={servicio.titulo}
+  subtitulo="Servicio"
+  seo={{ titulo: servicio.seoTitulo ?? servicio.titulo, descripcion: servicio.seoDescripcion }}
+>
+  {servicio.imagenUrl && (
+    <div class="mb-12 -mt-8">
+      <img
+        src={`${servicio.imagenUrl}?w=1200&h=400&fit=crop&auto=format&fm=webp`}
+        alt={servicio.titulo}
+        class="w-full h-60 lg:h-80 object-cover"
+        loading="eager"
+      />
+    </div>
+  )}
+
+  {servicio.descripcionCorta && (
+    <p class="text-xl font-sans text-firm-muted leading-relaxed mb-12 max-w-2xl">{servicio.descripcionCorta}</p>
+  )}
+
+  {servicio.contenido && (
+    <div class="max-w-3xl">
+      <PortableText content={servicio.contenido} />
+    </div>
+  )}
+
+  <div class="mt-16 pt-8 border-t border-firm-border">
+    <a href="/servicios" class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted hover:text-firm-gold transition-colors">
+      ← Volver a Servicios
+    </a>
+  </div>
+</PageLayout>
+
+<CtaSection />

@@ -1,0 +1,68 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getAllSectores, deleteSector } from '../../../lib/queries';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (form.get('_action') === 'delete') {
+    const id = Number(form.get('id'));
+    if (id) await deleteSector(id);
+  }
+  return Astro.redirect('/admin/sectores');
+}
+
+const sectores = await getAllSectores();
+---
+<AdminLayout title="Sectores">
+  <style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .btn-new { background: #0A0A0A; color: #F8F7F4; text-decoration: none; padding: 0.625rem 1.25rem; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th { text-align: left; padding: 0.75rem 1rem; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #6B6B6B; border-bottom: 1px solid #E2E0DB; }
+    td { padding: 0.875rem 1rem; font-size: 0.875rem; color: #0A0A0A; border-bottom: 1px solid #F0EEE9; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .td-actions { display: flex; gap: 0.5rem; }
+    .btn-edit { color: #0A0A0A; text-decoration: none; font-size: 0.8125rem; border-bottom: 1px solid #E2E0DB; }
+    .btn-edit:hover { border-color: #0A0A0A; }
+    .btn-delete { background: none; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.25rem 0.625rem; font-size: 0.75rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-delete:hover { background: #FEF2F2; }
+    .empty { padding: 2rem; text-align: center; color: #6B6B6B; font-size: 0.875rem; }
+    .color-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+  </style>
+
+  <div class="page-header">
+    <div></div>
+    <a href="/admin/sectores/nuevo" class="btn-new">+ Nuevo sector</a>
+  </div>
+
+  {sectores.length === 0
+    ? <div class="empty">No hay sectores todavía. <a href="/admin/sectores/nuevo">Crear el primero</a>.</div>
+    : (
+      <table>
+        <thead>
+          <tr><th>Título</th><th>Slug</th><th>Color</th><th>Orden</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {sectores.map((s: any) => (
+            <tr>
+              <td>{s.titulo}</td>
+              <td style="color:#6B6B6B;font-size:0.8125rem">{s.slug}</td>
+              <td><span class="color-dot" style={`background:${s.colorAccento}`}></span></td>
+              <td style="color:#6B6B6B">{s.orden}</td>
+              <td>
+                <div class="td-actions">
+                  <a href={`/admin/sectores/${s.id}`} class="btn-edit">Editar</a>
+                  <form method="POST" onsubmit="return confirm('¿Eliminar este sector?')">
+                    <input type="hidden" name="_action" value="delete" />
+                    <input type="hidden" name="id" value={s.id} />
+                    <button type="submit" class="btn-delete">Eliminar</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  }
+</AdminLayout>

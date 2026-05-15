@@ -1,0 +1,80 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getAllMiembrosAdmin, deleteMiembro } from '../../../lib/queries';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (form.get('_action') === 'delete') {
+    const id = Number(form.get('id'));
+    if (id) await deleteMiembro(id);
+  }
+  return Astro.redirect('/admin/equipo');
+}
+
+const miembros = await getAllMiembrosAdmin();
+const categorias: Record<string, any[]> = {};
+for (const m of miembros) {
+  const cat = m.categoria ?? 'otro';
+  if (!categorias[cat]) categorias[cat] = [];
+  categorias[cat].push(m);
+}
+---
+<AdminLayout title="Equipo">
+  <style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .btn-new { background: #0A0A0A; color: #F8F7F4; text-decoration: none; padding: 0.625rem 1.25rem; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+    .cat-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; margin: 1.5rem 0 0.75rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 1rem; }
+    th { text-align: left; padding: 0.75rem 1rem; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #6B6B6B; border-bottom: 1px solid #E2E0DB; }
+    td { padding: 0.875rem 1rem; font-size: 0.875rem; color: #0A0A0A; border-bottom: 1px solid #F0EEE9; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .td-actions { display: flex; gap: 0.5rem; }
+    .btn-edit { color: #0A0A0A; text-decoration: none; font-size: 0.8125rem; border-bottom: 1px solid #E2E0DB; }
+    .btn-edit:hover { border-color: #0A0A0A; }
+    .btn-delete { background: none; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.25rem 0.625rem; font-size: 0.75rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-delete:hover { background: #FEF2F2; }
+    .badge { display: inline-block; font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 2px; }
+    .badge-active { background: #F0FDF4; color: #166534; }
+    .badge-inactive { background: #F5F5F5; color: #6B6B6B; }
+    .empty { padding: 2rem; text-align: center; color: #6B6B6B; font-size: 0.875rem; }
+  </style>
+
+  <div class="page-header">
+    <div></div>
+    <a href="/admin/equipo/nuevo" class="btn-new">+ Nuevo miembro</a>
+  </div>
+
+  {miembros.length === 0
+    ? <div class="empty">No hay miembros todavía. <a href="/admin/equipo/nuevo">Añadir el primero</a>.</div>
+    : Object.entries(categorias).map(([cat, lista]) => (
+      <div>
+        <p class="cat-title">{cat}</p>
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Cargo</th><th>Orden</th><th>Estado</th><th>Acciones</th></tr>
+          </thead>
+          <tbody>
+            {lista.map((m: any) => (
+              <tr>
+                <td>{m.nombre}</td>
+                <td style="color:#6B6B6B">{m.cargo}</td>
+                <td style="color:#6B6B6B">{m.orden}</td>
+                <td><span class={`badge ${m.activo ? 'badge-active' : 'badge-inactive'}`}>{m.activo ? 'Activo' : 'Inactivo'}</span></td>
+                <td>
+                  <div class="td-actions">
+                    <a href={`/admin/equipo/${m.id}`} class="btn-edit">Editar</a>
+                    <form method="POST" onsubmit="return confirm('¿Eliminar este miembro?')">
+                      <input type="hidden" name="_action" value="delete" />
+                      <input type="hidden" name="id" value={m.id} />
+                      <button type="submit" class="btn-delete">Eliminar</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))
+  }
+</AdminLayout>

@@ -1,0 +1,101 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { createMiembro } from '../../../lib/queries';
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    const especialidades = String(form.get('especialidades') ?? '').split('\n').map(s => s.trim()).filter(Boolean);
+    const idiomas = String(form.get('idiomas') ?? '').split('\n').map(s => s.trim()).filter(Boolean);
+    const educacionRaw = String(form.get('educacion') ?? '').split('\n').map(s => s.trim()).filter(Boolean);
+    const educacion = educacionRaw.map(e => {
+      const [titulo, institucion] = e.split('|').map(x => x.trim());
+      return { titulo, institucion: institucion ?? '' };
+    });
+    await createMiembro({
+      nombre: form.get('nombre'), slug: form.get('slug'), cargo: form.get('cargo'),
+      categoria: form.get('categoria'), fotoUrl: form.get('foto_url'), email: form.get('email'),
+      linkedin: form.get('linkedin'), resumenCorto: form.get('resumen_corto'),
+      biografia: form.get('biografia'), especialidades, idiomas, educacion,
+      orden: Number(form.get('orden') ?? 0), mostrarEnHome: form.get('mostrar_en_home') === 'on',
+      activo: form.get('activo') !== 'off',
+    });
+    return Astro.redirect('/admin/equipo');
+  } catch (e: any) { error = e.message ?? 'Error al crear'; }
+}
+---
+<AdminLayout title="Nuevo miembro">
+  <style>
+    form { max-width: 700px; }
+    .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; border-bottom: 1px solid #E2E0DB; padding-bottom: 0.5rem; margin: 2rem 0 1.25rem; }
+    .section-title:first-of-type { margin-top: 0; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; color: #0A0A0A; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    label small { text-transform: none; letter-spacing: normal; font-weight: 400; color: #6B6B6B; }
+    input[type="text"], input[type="url"], input[type="email"], input[type="number"], select, textarea {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid #E2E0DB;
+      padding: 0.5rem 0; font-size: 0.9375rem; color: #0A0A0A; outline: none;
+      transition: border-color 0.2s; font-family: 'Inter', sans-serif;
+    }
+    select { background: #fff; }
+    input:focus, select:focus, textarea:focus { border-color: #0A0A0A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .check-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-transform: none; letter-spacing: normal; font-size: 0.875rem; }
+    .check-label input { width: auto; border: none; border-bottom: none; }
+    .error-msg { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 1.5rem; }
+    .actions { display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem; }
+    .btn-save { background: #0A0A0A; color: #F8F7F4; border: none; padding: 0.875rem 2rem; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-cancel { color: #6B6B6B; text-decoration: none; font-size: 0.8125rem; }
+  </style>
+
+  {error && <div class="error-msg">{error}</div>}
+
+  <form method="POST">
+    <p class="section-title">Información principal</p>
+    <div class="grid-2">
+      <div class="field"><label>Nombre completo *</label><input type="text" name="nombre" required /></div>
+      <div class="field"><label>Slug * <small>(/equipo/slug)</small></label><input type="text" name="slug" required pattern="[a-z0-9\-]+" /></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Cargo</label><input type="text" name="cargo" /></div>
+      <div class="field">
+        <label>Categoría</label>
+        <select name="categoria">
+          <option value="socio">Socio</option>
+          <option value="asociado" selected>Asociado</option>
+          <option value="of_counsel">Of Counsel</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Foto (URL)</label><input type="url" name="foto_url" /></div>
+    <div class="grid-2">
+      <div class="field"><label>Email</label><input type="email" name="email" /></div>
+      <div class="field"><label>LinkedIn (URL)</label><input type="url" name="linkedin" /></div>
+    </div>
+    <div class="field"><label>Resumen corto</label><textarea name="resumen_corto" style="min-height:60px"></textarea></div>
+    <div class="field"><label>Biografía <small>(Markdown)</small></label><textarea name="biografia" style="min-height:160px"></textarea></div>
+
+    <p class="section-title">Detalles</p>
+    <div class="field"><label>Especialidades <small>(una por línea)</small></label><textarea name="especialidades" style="min-height:80px"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Idiomas <small>(uno por línea)</small></label><textarea name="idiomas" style="min-height:80px"></textarea></div>
+      <div class="field"><label>Formación <small>(Título|Institución, uno por línea)</small></label><textarea name="educacion" style="min-height:80px"></textarea></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Orden</label><input type="number" name="orden" value="0" min="0" /></div>
+      <div class="field" style="display:flex;flex-direction:column;gap:0.75rem;justify-content:flex-end;padding-bottom:0.5rem">
+        <label class="check-label"><input type="checkbox" name="mostrar_en_home" /> Mostrar en portada</label>
+        <label class="check-label"><input type="checkbox" name="activo" checked /> Activo</label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-save">Crear miembro</button>
+      <a href="/admin/equipo" class="btn-cancel">Cancelar</a>
+    </div>
+  </form>
+</AdminLayout>

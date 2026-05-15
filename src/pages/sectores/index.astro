@@ -1,0 +1,24 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import SectorCard from '@/components/ui/SectorCard.astro';
+import { getAllSectores } from '@/lib/queries';
+
+const sectores = await getAllSectores();
+---
+<PageLayout titulo="Sectores de actividad" subtitulo="Sectores">
+  {sectores.length === 0 ? (
+    <p class="text-firm-muted font-sans">No hay sectores disponibles.</p>
+  ) : (
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {sectores.map((s: any) => (
+        <SectorCard
+          titulo={s.titulo}
+          slug={s.slug}
+          descripcionCorta={s.descripcionCorta}
+          imagenUrl={s.imagenUrl}
+          colorAccento={s.colorAccento}
+        />
+      ))}
+    </div>
+  )}
+</PageLayout>

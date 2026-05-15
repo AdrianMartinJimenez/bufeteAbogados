@@ -1,0 +1,73 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { createServicio } from '../../../lib/queries';
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    await createServicio({
+      titulo: form.get('titulo'), slug: form.get('slug'),
+      descripcionCorta: form.get('descripcion_corta'), icono: form.get('icono'),
+      imagenUrl: form.get('imagen_url'), contenido: form.get('contenido'),
+      orden: Number(form.get('orden') ?? 0), destacado: form.get('destacado') === 'on',
+      seoTitulo: form.get('seo_titulo'), seoDescripcion: form.get('seo_descripcion'),
+    });
+    return Astro.redirect('/admin/servicios');
+  } catch (e: any) { error = e.message ?? 'Error al crear'; }
+}
+---
+<AdminLayout title="Nuevo servicio">
+  <style>
+    form { max-width: 700px; }
+    .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; border-bottom: 1px solid #E2E0DB; padding-bottom: 0.5rem; margin: 2rem 0 1.25rem; }
+    .section-title:first-of-type { margin-top: 0; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; color: #0A0A0A; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    label small { text-transform: none; letter-spacing: normal; font-weight: 400; color: #6B6B6B; }
+    input[type="text"], input[type="url"], input[type="number"], textarea {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid #E2E0DB;
+      padding: 0.5rem 0; font-size: 0.9375rem; color: #0A0A0A; outline: none;
+      transition: border-color 0.2s; font-family: 'Inter', sans-serif;
+    }
+    input:focus, textarea:focus { border-color: #0A0A0A; }
+    textarea { resize: vertical; min-height: 120px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .check-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-transform: none; letter-spacing: normal; font-size: 0.875rem; }
+    .check-label input { width: auto; border: none; border-bottom: none; }
+    .error-msg { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 1.5rem; }
+    .actions { display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem; }
+    .btn-save { background: #0A0A0A; color: #F8F7F4; border: none; padding: 0.875rem 2rem; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-cancel { color: #6B6B6B; text-decoration: none; font-size: 0.8125rem; }
+  </style>
+
+  {error && <div class="error-msg">{error}</div>}
+
+  <form method="POST">
+    <p class="section-title">Información principal</p>
+    <div class="field"><label>Título *</label><input type="text" name="titulo" required /></div>
+    <div class="field"><label>Slug * <small>(URL: /servicios/mi-slug)</small></label><input type="text" name="slug" required pattern="[a-z0-9\-]+" /></div>
+    <div class="field"><label>Descripción corta</label><textarea name="descripcion_corta" style="min-height:60px"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Icono <small>(emoji o clase)</small></label><input type="text" name="icono" /></div>
+      <div class="field"><label>Imagen (URL)</label><input type="url" name="imagen_url" /></div>
+    </div>
+    <div class="field"><label>Contenido completo <small>(Markdown)</small></label><textarea name="contenido" style="min-height:200px"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Orden</label><input type="number" name="orden" value="0" min="0" /></div>
+      <div class="field" style="display:flex;align-items:flex-end;padding-bottom:0.5rem">
+        <label class="check-label"><input type="checkbox" name="destacado" /> Destacar en portada</label>
+      </div>
+    </div>
+
+    <p class="section-title">SEO</p>
+    <div class="field"><label>Título SEO</label><input type="text" name="seo_titulo" /></div>
+    <div class="field"><label>Descripción SEO</label><textarea name="seo_descripcion" style="min-height:60px"></textarea></div>
+
+    <div class="actions">
+      <button type="submit" class="btn-save">Crear servicio</button>
+      <a href="/admin/servicios" class="btn-cancel">Cancelar</a>
+    </div>
+  </form>
+</AdminLayout>

@@ -1,0 +1,141 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getConfiguracion, updateConfiguracion } from '../../lib/queries';
+
+let success = false;
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    const data: Record<string, string> = {};
+    const fields = [
+      'nombre_sitio','logo_url','hero_titulo','hero_descripcion','hero_cta_texto','hero_cta_enlace',
+      'hero_imagen_url','sobre_titulo','sobre_contenido','sobre_imagen_url','sobre_cta_texto','sobre_cta_enlace',
+      'servicios_titulo','sectores_titulo','equipo_titulo','reconocimientos_titulo',
+      'cta_titulo','cta_subtitulo','cta_boton1_texto','cta_boton1_enlace','cta_boton2_texto','cta_boton2_enlace',
+      'linkedin','instagram','twitter','footer_texto','seo_titulo','seo_descripcion','seo_imagen_url',
+    ];
+    // Hero subtítulos (multilinea → array JSON)
+    const subtitulosRaw = String(form.get('hero_subtitulos') ?? '').split('\n').map(s => s.trim()).filter(Boolean);
+    data.hero_subtitulos = JSON.stringify(subtitulosRaw);
+    // Badges (multilinea → array JSON de objetos)
+    const badgesRaw = String(form.get('badges_raw') ?? '').split('\n').map(s => s.trim()).filter(Boolean);
+    data.badges = JSON.stringify(badgesRaw.map(b => {
+      const [texto, descripcion] = b.split('|').map(x => x.trim());
+      return { texto, descripcion: descripcion ?? '' };
+    }));
+    for (const f of fields) {
+      const val = form.get(f);
+      if (val !== null) data[f] = String(val).trim();
+    }
+    await updateConfiguracion(data);
+    success = true;
+  } catch (e: any) {
+    error = e.message ?? 'Error al guardar';
+  }
+}
+
+const config = await getConfiguracion();
+const subtitulosStr = Array.isArray(config?.heroSubtitulos) ? config.heroSubtitulos.join('\n') : '';
+const badgesArr = Array.isArray(config?.badges) ? config.badges : [];
+const badgesStr = badgesArr.map((b: any) => typeof b === 'object' ? `${b.texto}|${b.descripcion ?? ''}` : b).join('\n');
+---
+<AdminLayout title="Configuración general">
+  <style>
+    form { max-width: 800px; }
+    .section-title {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #6B6B6B;
+      border-bottom: 1px solid #E2E0DB; padding-bottom: 0.5rem;
+      margin: 2rem 0 1.25rem;
+    }
+    .section-title:first-of-type { margin-top: 0; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; color: #0A0A0A;
+            text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    label small { text-transform: none; letter-spacing: normal; font-weight: 400; color: #6B6B6B; }
+    input[type="text"], input[type="url"], input[type="email"], textarea {
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid #E2E0DB;
+      padding: 0.5rem 0; font-size: 0.9375rem; color: #0A0A0A;
+      outline: none; transition: border-color 0.2s; font-family: 'Inter', sans-serif;
+    }
+    input:focus, textarea:focus { border-color: #0A0A0A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .success { background: #F0FDF4; border: 1px solid #86EFAC; color: #166534; padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 1.5rem; }
+    .error-msg { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 1.5rem; }
+    .btn-save {
+      background: #0A0A0A; color: #F8F7F4; border: none; padding: 0.875rem 2rem;
+      font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; transition: opacity 0.2s;
+      font-family: 'Inter', sans-serif; margin-top: 1rem;
+    }
+    .btn-save:hover { opacity: 0.85; }
+  </style>
+
+  {success && <div class="success">Configuración guardada correctamente.</div>}
+  {error && <div class="error-msg">{error}</div>}
+
+  <form method="POST">
+    <p class="section-title">Identidad del despacho</p>
+    <div class="field"><label>Nombre del despacho</label><input type="text" name="nombre_sitio" value={config?.nombreSitio ?? ''} /></div>
+    <div class="field"><label>Logo (URL)</label><input type="url" name="logo_url" value={config?.logoUrl ?? ''} /></div>
+
+    <p class="section-title">Hero (portada)</p>
+    <div class="field"><label>Título principal</label><input type="text" name="hero_titulo" value={config?.heroTitulo ?? ''} /></div>
+    <div class="field"><label>Subtítulos <small>(uno por línea)</small></label><textarea name="hero_subtitulos">{subtitulosStr}</textarea></div>
+    <div class="field"><label>Descripción</label><textarea name="hero_descripcion">{config?.heroDescripcion ?? ''}</textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Texto CTA</label><input type="text" name="hero_cta_texto" value={config?.heroCtaTexto ?? ''} /></div>
+      <div class="field"><label>Enlace CTA</label><input type="text" name="hero_cta_enlace" value={config?.heroCtaEnlace ?? ''} /></div>
+    </div>
+    <div class="field"><label>Imagen de fondo (URL)</label><input type="url" name="hero_imagen_url" value={config?.heroImagenUrl ?? ''} /></div>
+
+    <p class="section-title">Sección «Sobre el despacho»</p>
+    <div class="field"><label>Título</label><input type="text" name="sobre_titulo" value={config?.sobreTitulo ?? ''} /></div>
+    <div class="field"><label>Contenido (Markdown)</label><textarea name="sobre_contenido" style="min-height:120px">{config?.sobreContenido ?? ''}</textarea></div>
+    <div class="field"><label>Imagen (URL)</label><input type="url" name="sobre_imagen_url" value={config?.sobreImagenUrl ?? ''} /></div>
+    <div class="grid-2">
+      <div class="field"><label>Texto CTA</label><input type="text" name="sobre_cta_texto" value={config?.sobreCtaTexto ?? ''} /></div>
+      <div class="field"><label>Enlace CTA</label><input type="text" name="sobre_cta_enlace" value={config?.sobreCtaEnlace ?? ''} /></div>
+    </div>
+
+    <p class="section-title">Títulos de secciones</p>
+    <div class="grid-2">
+      <div class="field"><label>Servicios</label><input type="text" name="servicios_titulo" value={config?.serviciosTitulo ?? ''} /></div>
+      <div class="field"><label>Sectores</label><input type="text" name="sectores_titulo" value={config?.sectoresTitulo ?? ''} /></div>
+      <div class="field"><label>Equipo</label><input type="text" name="equipo_titulo" value={config?.equipoTitulo ?? ''} /></div>
+      <div class="field"><label>Reconocimientos</label><input type="text" name="reconocimientos_titulo" value={config?.reconocimientosTitulo ?? ''} /></div>
+    </div>
+
+    <p class="section-title">Badges / Reconocimientos <small style="font-weight:400;text-transform:none;letter-spacing:normal;color:#6B6B6B">(texto|descripción, uno por línea)</small></p>
+    <div class="field"><textarea name="badges_raw" style="min-height:100px">{badgesStr}</textarea></div>
+
+    <p class="section-title">Sección CTA final</p>
+    <div class="field"><label>Título</label><input type="text" name="cta_titulo" value={config?.ctaTitulo ?? ''} /></div>
+    <div class="field"><label>Subtítulo</label><input type="text" name="cta_subtitulo" value={config?.ctaSubtitulo ?? ''} /></div>
+    <div class="grid-2">
+      <div class="field"><label>Botón 1 texto</label><input type="text" name="cta_boton1_texto" value={config?.ctaBoton1Texto ?? ''} /></div>
+      <div class="field"><label>Botón 1 enlace</label><input type="text" name="cta_boton1_enlace" value={config?.ctaBoton1Enlace ?? ''} /></div>
+      <div class="field"><label>Botón 2 texto</label><input type="text" name="cta_boton2_texto" value={config?.ctaBoton2Texto ?? ''} /></div>
+      <div class="field"><label>Botón 2 enlace</label><input type="text" name="cta_boton2_enlace" value={config?.ctaBoton2Enlace ?? ''} /></div>
+    </div>
+
+    <p class="section-title">Redes sociales & Footer</p>
+    <div class="grid-2">
+      <div class="field"><label>LinkedIn (URL)</label><input type="url" name="linkedin" value={config?.linkedin ?? ''} /></div>
+      <div class="field"><label>Instagram (URL)</label><input type="url" name="instagram" value={config?.instagram ?? ''} /></div>
+      <div class="field"><label>Twitter/X (URL)</label><input type="url" name="twitter" value={config?.twitter ?? ''} /></div>
+    </div>
+    <div class="field"><label>Texto del footer</label><textarea name="footer_texto">{config?.footerTexto ?? ''}</textarea></div>
+
+    <p class="section-title">SEO global</p>
+    <div class="field"><label>Título SEO</label><input type="text" name="seo_titulo" value={config?.seoTitulo ?? ''} /></div>
+    <div class="field"><label>Descripción SEO</label><textarea name="seo_descripcion">{config?.seoDescripcion ?? ''}</textarea></div>
+    <div class="field"><label>Imagen OG (URL)</label><input type="url" name="seo_imagen_url" value={config?.seoImagenUrl ?? ''} /></div>
+
+    <button type="submit" class="btn-save">Guardar configuración</button>
+  </form>
+</AdminLayout>

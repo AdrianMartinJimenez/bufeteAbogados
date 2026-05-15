@@ -1,0 +1,137 @@
+---
+import { getAllServicios, getAllSectores } from '@/lib/queries';
+import MobileMenu from '@/components/interactive/MobileMenu';
+
+const pathname = Astro.url.pathname;
+const servicios = await getAllServicios();
+const sectores = await getAllSectores();
+
+const navItems = [
+  { label: 'Servicios', href: '/servicios', hasDropdown: true },
+  { label: 'Sectores', href: '/sectores', hasDropdown: true },
+  { label: 'Equipo', href: '/equipo', hasDropdown: false },
+  { label: 'Conocimiento', href: '/conocimiento', hasDropdown: false },
+  { label: 'Prensa', href: '/prensa', hasDropdown: false },
+];
+---
+<header
+  id="site-header"
+  class="sticky top-0 z-50 transition-all duration-300 text-firm-black"
+  data-transparent={pathname === '/'}}
+>
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-16 lg:h-20">
+    <!-- Logo -->
+    <a href="/" class="font-serif text-xl lg:text-2xl tracking-widest uppercase flex-shrink-0" aria-label="Inicio — Despacho de Abogados">
+      <span id="header-logo">DESPACHO</span>
+    </a>
+
+    <!-- Navegación desktop -->
+    <nav aria-label="Navegación principal" class="hidden lg:flex items-center gap-8">
+      {navItems.map((item) => (
+        <div class="relative group">
+          <a
+            href={item.href}
+            class:list={[
+              'text-xs uppercase tracking-[0.15em] font-sans transition-colors duration-200 link-underline pb-1',
+              pathname.startsWith(item.href) ? 'text-firm-gold' : 'text-inherit hover:text-firm-gold',
+            ]}
+          >
+            {item.label}
+          </a>
+
+          {/* Dropdown servicios */}
+          {item.label === 'Servicios' && (
+            <div class="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 w-72" role="menu">
+              <div class="bg-firm-white border border-firm-border shadow-sm p-4">
+                {servicios.slice(0, 8).map((s: any) => (
+                  <a
+                    href={`/servicios/${s.slug}`}
+                    class="block py-2 text-sm font-sans hover:text-firm-gold transition-colors border-b border-firm-border/50 last:border-0"
+                    role="menuitem"
+                  >
+                    {s.titulo}
+                  </a>
+                ))}
+                <a href="/servicios" class="block pt-3 text-xs uppercase tracking-widest text-firm-gold hover:underline">
+                  Ver todos →
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Dropdown sectores */}
+          {item.label === 'Sectores' && (
+            <div class="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 w-60" role="menu">
+              <div class="bg-firm-white border border-firm-border shadow-sm p-4">
+                {sectores.slice(0, 6).map((s: any) => (
+                  <a
+                    href={`/sectores/${s.slug}`}
+                    class="block py-2 text-sm font-sans hover:text-firm-gold transition-colors border-b border-firm-border/50 last:border-0"
+                    role="menuitem"
+                  >
+                    {s.titulo}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </nav>
+
+    <!-- Contacto + hamburger -->
+    <div class="flex items-center gap-4">
+      <a
+        href="/contacto"
+        class="hidden lg:inline-flex items-center text-xs uppercase tracking-[0.15em] font-sans border border-current px-5 py-2.5 hover:bg-firm-black hover:text-firm-white transition-all duration-200"
+      >
+        Contacto
+      </a>
+      <button
+        id="mobile-menu-btn"
+        class="lg:hidden p-2 -mr-2"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Menú mobile (React island) -->
+<MobileMenu
+  client:load
+  servicios={servicios.map((s: any) => ({ titulo: s.titulo, slug: s.slug }))}
+  sectores={sectores.map((s: any) => ({ titulo: s.titulo, slug: s.slug }))}
+/>
+
+<script>
+  // Transparencia del header en home
+  const header = document.getElementById('site-header');
+  const isHome = header?.dataset.transparent !== undefined;
+
+  function updateHeader() {
+    if (!header) return;
+    const logo = document.getElementById('header-logo');
+    if (isHome && window.scrollY < 80) {
+      header.classList.remove('bg-firm-white', 'border-b', 'border-firm-border', 'text-firm-black');
+      header.classList.add('text-white');
+      if (logo) logo.style.color = 'white';
+    } else {
+      header.classList.add('bg-firm-white', 'border-b', 'border-firm-border', 'text-firm-black');
+      header.classList.remove('text-white');
+      if (logo) logo.style.color = '';
+    }
+  }
+
+  if (isHome) {
+    updateHeader();
+    window.addEventListener('scroll', updateHeader, { passive: true });
+  } else {
+    header?.classList.add('bg-firm-white', 'border-b', 'border-firm-border', 'text-firm-black');
+  }
+</script>

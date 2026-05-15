@@ -1,0 +1,35 @@
+---
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+
+interface Servicio {
+  titulo: string;
+  slug: string;
+  descripcionCorta?: string;
+  icono?: string;
+}
+
+interface Props {
+  titulo?: string;
+  servicios: Servicio[];
+}
+
+const { titulo = 'Áreas de práctica', servicios = [] } = Astro.props;
+---
+<section class="py-24 lg:py-32 bg-firm-white border-t border-firm-border">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+      <div>
+        <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.2em] mb-3">Servicios</p>
+        <h2 class="font-serif text-4xl lg:text-5xl font-light">{titulo}</h2>
+      </div>
+      <a href="/servicios" class="text-xs font-sans uppercase tracking-[0.2em] link-underline hover:text-firm-gold transition-colors self-start md:self-auto">
+        Ver todos →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {servicios.map((s) => (
+        <ServiceCard {...s} />
+      ))}
+    </div>
+  </div>
+</section>

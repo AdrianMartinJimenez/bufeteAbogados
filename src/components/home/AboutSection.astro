@@ -1,0 +1,50 @@
+---
+interface Props {
+  titulo?: string;
+  contenido?: string;
+  ctaTexto?: string;
+  ctaEnlace?: string;
+  imagenUrl?: string;
+}
+
+const {
+  titulo = 'Excelencia jurídica al servicio de sus intereses',
+  contenido,
+  ctaTexto = 'Conocer el despacho',
+  ctaEnlace = '/equipo',
+  imagenUrl,
+} = Astro.props;
+---
+<section class="py-24 lg:py-32 max-w-7xl mx-auto px-6 lg:px-12">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+    <!-- Imagen -->
+    {imagenUrl && (
+      <div class="relative">
+        <img
+          src={`${imagenUrl}?w=700&h=800&fit=crop&auto=format&fm=webp`}
+          alt="Despacho de Abogados"
+          class="w-full aspect-[7/8] object-cover img-grayscale"
+          loading="lazy"
+          decoding="async"
+        />
+        <!-- Accent line -->
+        <div class="absolute -bottom-6 -right-6 w-24 h-24 border border-firm-gold hidden lg:block" aria-hidden="true"></div>
+      </div>
+    )}
+
+    <!-- Texto -->
+    <div class:list={[imagenUrl ? '' : 'lg:col-span-2 max-w-3xl']}>
+      <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.2em] mb-6">Sobre el despacho</p>
+      <h2 class="font-serif text-4xl lg:text-5xl font-light leading-tight mb-8">{titulo}</h2>
+      {contenido && (
+        <p class="text-firm-muted font-sans text-lg leading-relaxed mb-10">{contenido}</p>
+      )}
+      <a
+        href={ctaEnlace}
+        class="inline-flex items-center gap-3 text-xs font-sans uppercase tracking-[0.2em] link-underline hover:text-firm-gold transition-colors"
+      >
+        {ctaTexto} <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>

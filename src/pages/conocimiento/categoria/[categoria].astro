@@ -1,0 +1,33 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ArticleCard from '@/components/ui/ArticleCard.astro';
+import { getArticulos } from '@/lib/queries';
+
+const { categoria } = Astro.params;
+const categoriaLabel = categoria ?? '';
+const { items } = await getArticulos(1, categoriaLabel);
+---
+<PageLayout titulo={categoriaLabel} subtitulo="Conocimiento · Categoría">
+  <div class="mb-8">
+    <a href="/conocimiento" class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted hover:text-firm-gold transition-colors">
+      ← Todas las categorías
+    </a>
+  </div>
+  {items.length === 0 ? (
+    <p class="text-firm-muted font-sans">No hay artículos en esta categoría.</p>
+  ) : (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+      {items.map((a: any) => (
+        <ArticleCard
+          titulo={a.titulo}
+          slug={a.slug}
+          fechaPublicacion={a.fechaPublicacion}
+          categorias={a.categorias}
+          extracto={a.extracto}
+          imagenUrl={a.imagenUrl}
+          autorNombre={a.autorNombre}
+        />
+      ))}
+    </div>
+  )}
+</PageLayout>

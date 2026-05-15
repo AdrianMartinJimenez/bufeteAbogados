@@ -1,0 +1,40 @@
+---
+interface Props {
+  nombre: string;
+  slug: string;
+  cargo?: string;
+  categoria?: string;
+  fotoUrl?: string;
+  especialidades?: string[];
+}
+
+const { nombre, slug, cargo, fotoUrl, especialidades } = Astro.props;
+---
+<a href={`/equipo/${slug}`} class="group block">
+  <div class="aspect-[3/4] overflow-hidden mb-4">
+    {fotoUrl ? (
+      <img
+        src={`${fotoUrl}?w=400&h=533&fit=crop&auto=format&fm=webp`}
+        alt={nombre}
+        class="w-full h-full object-cover img-grayscale transition-transform duration-500 group-hover:scale-105"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="w-full h-full bg-firm-border flex items-center justify-center">
+        <span class="font-serif text-4xl text-firm-muted">{nombre[0]}</span>
+      </div>
+    )}
+  </div>
+  <h3 class="font-serif text-xl font-light group-hover:text-firm-gold transition-colors">{nombre}</h3>
+  {cargo && <p class="text-xs font-sans uppercase tracking-[0.15em] text-firm-muted mt-1">{cargo}</p>}
+  {especialidades && especialidades.length > 0 && (
+    <div class="flex flex-wrap gap-1 mt-3">
+      {especialidades.slice(0, 3).map((esp: string) => (
+        <span class="text-[10px] font-sans uppercase tracking-wider text-firm-muted border border-firm-border px-2 py-0.5">
+          {esp}
+        </span>
+      ))}
+    </div>
+  )}
+</a>

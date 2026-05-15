@@ -1,0 +1,97 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getArticuloById, updateArticulo, getAllMiembros } from '../../../lib/queries';
+
+const id = Number(Astro.params.id);
+if (!id) return Astro.redirect('/admin/articulos');
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    const categorias = String(form.get('categorias') ?? '').split(',').map(s => s.trim()).filter(Boolean);
+    const etiquetas = String(form.get('etiquetas') ?? '').split(',').map(s => s.trim()).filter(Boolean);
+    await updateArticulo(id, {
+      titulo: form.get('titulo'), slug: form.get('slug'),
+      publicado: form.get('publicado') === 'on',
+      fechaPublicacion: form.get('fecha_publicacion'),
+      autorId: form.get('autor_id') || null,
+      categorias, etiquetas,
+      imagenUrl: form.get('imagen_url'), imagenAlt: form.get('imagen_alt'),
+      extracto: form.get('extracto'), contenido: form.get('contenido'),
+      seoTitulo: form.get('seo_titulo'), seoDescripcion: form.get('seo_descripcion'),
+    });
+    return Astro.redirect('/admin/articulos');
+  } catch (e: any) { error = e.message ?? 'Error al guardar'; }
+}
+
+const [a, miembros] = await Promise.all([getArticuloById(id), getAllMiembros()]);
+if (!a) return Astro.redirect('/admin/articulos');
+
+const categoriasStr = Array.isArray(a.categorias) ? a.categorias.join(', ') : '';
+const etiquetasStr = Array.isArray(a.etiquetas) ? a.etiquetas.join(', ') : '';
+---
+<AdminLayout title={`Editar: ${a.titulo}`}>
+  <style>
+    form { max-width: 800px; }
+    .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; border-bottom: 1px solid #E2E0DB; padding-bottom: 0.5rem; margin: 2rem 0 1.25rem; }
+    .section-title:first-of-type { margin-top: 0; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; color: #0A0A0A; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    label small { text-transform: none; letter-spacing: normal; font-weight: 400; color: #6B6B6B; }
+    input[type="text"], input[type="url"], input[type="date"], select, textarea {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid #E2E0DB;
+      padding: 0.5rem 0; font-size: 0.9375rem; color: #0A0A0A; outline: none;
+      transition: border-color 0.2s; font-family: 'Inter', sans-serif;
+    }
+    select { background: #fff; }
+    input:focus, select:focus, textarea:focus { border-color: #0A0A0A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .check-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-transform: none; letter-spacing: normal; font-size: 0.875rem; }
+    .check-label input { width: auto; border: none; border-bottom: none; }
+    .error-msg { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 1.5rem; }
+    .actions { display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; }
+    .btn-save { background: #0A0A0A; color: #F8F7F4; border: none; padding: 0.875rem 2rem; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-cancel { color: #6B6B6B; text-decoration: none; font-size: 0.8125rem; }
+    .preview-link { font-size: 0.8125rem; color: #C9A84C; text-decoration: none; }
+  </style>
+
+  {error && <div class="error-msg">{error}</div>}
+  <div style="margin-bottom:1rem"><a href={`/conocimiento/${a.slug}`} target="_blank" class="preview-link">Ver en el sitio ↗</a></div>
+
+  <form method="POST">
+    <p class="section-title">Información principal</p>
+    <div class="field"><label>Título *</label><input type="text" name="titulo" value={a.titulo} required /></div>
+    <div class="field"><label>Slug *</label><input type="text" name="slug" value={a.slug} required pattern="[a-z0-9\-]+" /></div>
+    <div class="grid-2">
+      <div class="field"><label>Fecha de publicación</label><input type="date" name="fecha_publicacion" value={a.fechaPublicacion} /></div>
+      <div class="field">
+        <label>Autor</label>
+        <select name="autor_id">
+          <option value="">Sin autor</option>
+          {miembros.map((m: any) => <option value={m.id} selected={String(m.id) === String(a.autorId)}>{m.nombre}</option>)}
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Categorías <small>(separadas por comas)</small></label><input type="text" name="categorias" value={categoriasStr} /></div>
+    <div class="field"><label>Etiquetas <small>(separadas por comas)</small></label><input type="text" name="etiquetas" value={etiquetasStr} /></div>
+    <div class="grid-2">
+      <div class="field"><label>Imagen (URL)</label><input type="url" name="imagen_url" value={a.imagenUrl ?? ''} /></div>
+      <div class="field"><label>Alt de la imagen</label><input type="text" name="imagen_alt" value={a.imagenAlt ?? ''} /></div>
+    </div>
+    <div class="field"><label>Extracto</label><textarea name="extracto" style="min-height:70px">{a.extracto ?? ''}</textarea></div>
+    <div class="field"><label>Contenido <small>(Markdown)</small></label><textarea name="contenido" style="min-height:300px">{a.contenido ?? ''}</textarea></div>
+
+    <p class="section-title">SEO</p>
+    <div class="field"><label>Título SEO</label><input type="text" name="seo_titulo" value={a.seoTitulo ?? ''} /></div>
+    <div class="field"><label>Descripción SEO</label><textarea name="seo_descripcion" style="min-height:60px">{a.seoDescripcion ?? ''}</textarea></div>
+
+    <div class="actions">
+      <button type="submit" class="btn-save">Guardar cambios</button>
+      <label class="check-label"><input type="checkbox" name="publicado" checked={a.publicado === 1} /> Publicado</label>
+      <a href="/admin/articulos" class="btn-cancel">Cancelar</a>
+    </div>
+  </form>
+</AdminLayout>

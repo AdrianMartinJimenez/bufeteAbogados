@@ -1,0 +1,74 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { db } from '../../lib/db';
+
+async function count(table: string) {
+  const { rows } = await db.execute(`SELECT COUNT(*) as n FROM ${table}`);
+  return Number((rows[0] as any)?.n ?? 0);
+}
+
+const [servicios, sectores, miembros, articulos, noticias] = await Promise.all([
+  count('servicios'), count('sectores'), count('miembros'), count('articulos'), count('noticias'),
+]);
+
+const stats = [
+  { label: 'Servicios', value: servicios, href: '/admin/servicios', color: '#C9A84C' },
+  { label: 'Sectores', value: sectores, href: '/admin/sectores', color: '#C9A84C' },
+  { label: 'Miembros', value: miembros, href: '/admin/equipo', color: '#C9A84C' },
+  { label: 'Artículos', value: articulos, href: '/admin/articulos', color: '#C9A84C' },
+  { label: 'Noticias', value: noticias, href: '/admin/noticias', color: '#C9A84C' },
+];
+---
+<AdminLayout title="Dashboard">
+  <style>
+    .welcome { margin-bottom: 2rem; }
+    .welcome h2 { font-size: 1.5rem; font-weight: 300; color: #0A0A0A; }
+    .welcome p { font-size: 0.875rem; color: #6B6B6B; margin-top: 0.25rem; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .stat-card {
+      background: #fff; border: 1px solid #E2E0DB;
+      padding: 1.5rem; text-decoration: none; display: block;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: #C9A84C; }
+    .stat-number { font-size: 2.25rem; font-weight: 300; color: #0A0A0A; line-height: 1; }
+    .stat-label { font-size: 0.75rem; color: #6B6B6B; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .quick-actions h3 { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: #6B6B6B; margin-bottom: 1rem; }
+    .actions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+    .action-link {
+      background: #fff; border: 1px solid #E2E0DB;
+      padding: 1rem 1.25rem; text-decoration: none;
+      font-size: 0.8125rem; color: #0A0A0A;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .action-link:hover { border-color: #0A0A0A; }
+    .action-link span { color: #C9A84C; }
+  </style>
+
+  <div class="welcome">
+    <h2>Bienvenido al panel de control</h2>
+    <p>Gestiona el contenido del sitio web desde aquí.</p>
+  </div>
+
+  <div class="stats">
+    {stats.map(s => (
+      <a href={s.href} class="stat-card">
+        <div class="stat-number">{s.value}</div>
+        <div class="stat-label">{s.label}</div>
+      </a>
+    ))}
+  </div>
+
+  <div class="quick-actions">
+    <h3>Acciones rápidas</h3>
+    <div class="actions-grid">
+      <a href="/admin/servicios/nuevo" class="action-link">Nuevo servicio <span>+</span></a>
+      <a href="/admin/sectores/nuevo" class="action-link">Nuevo sector <span>+</span></a>
+      <a href="/admin/equipo/nuevo" class="action-link">Nuevo miembro <span>+</span></a>
+      <a href="/admin/articulos/nuevo" class="action-link">Nuevo artículo <span>+</span></a>
+      <a href="/admin/noticias/nuevo" class="action-link">Nueva noticia <span>+</span></a>
+      <a href="/admin/configuracion" class="action-link">Configuración <span>→</span></a>
+    </div>
+  </div>
+</AdminLayout>

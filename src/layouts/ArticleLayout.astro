@@ -1,0 +1,91 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { formatDate } from '@/lib/utils';
+
+interface Props {
+  titulo: string;
+  fechaPublicacion?: string;
+  categorias?: string[];
+  imagenUrl?: string;
+  imagenAlt?: string;
+  autor?: { nombre: string; cargo?: string; slug: string; fotoUrl?: string };
+  fuenteExterna?: string;
+  seo?: { titulo?: string; descripcion?: string; imagen?: string };
+}
+
+const {
+  titulo,
+  fechaPublicacion,
+  categorias = [],
+  imagenUrl,
+  imagenAlt,
+  autor,
+  fuenteExterna,
+  seo,
+} = Astro.props;
+---
+<BaseLayout seo={seo ?? { titulo, tipo: 'article' }}>
+  <!-- Hero del artículo -->
+  <header class="relative min-h-[50vh] lg:min-h-[60vh] flex items-end">
+    {imagenUrl ? (
+      <img
+        src={`${imagenUrl}?w=1400&h=700&fit=crop&auto=format&fm=webp`}
+        alt={imagenAlt ?? titulo}
+        class="absolute inset-0 w-full h-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+        transition:name={`img-${seo?.titulo ?? titulo}`}
+      />
+    ) : (
+      <div class="absolute inset-0 bg-firm-black"></div>
+    )}
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+    <div class="relative z-10 max-w-4xl mx-auto px-6 lg:px-12 pb-12">
+      {categorias.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-4">
+          {categorias.map((cat) => (
+            <span class="text-firm-gold text-xs font-sans uppercase tracking-[0.15em]">{cat}</span>
+          ))}
+        </div>
+      )}
+      <h1 class="font-serif text-3xl lg:text-5xl font-light text-white leading-snug mb-4">{titulo}</h1>
+      <div class="flex items-center gap-4 text-white/60 text-sm font-sans">
+        {fechaPublicacion && <time>{formatDate(fechaPublicacion)}</time>}
+        {fuenteExterna && <span>· {fuenteExterna}</span>}
+        {autor && (
+          <span>· <a href={`/equipo/${autor.slug}`} class="hover:text-firm-gold transition-colors">{autor.nombre}</a></span>
+        )}
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <div class="max-w-3xl mx-auto px-6 lg:px-0 py-16">
+    <article class="prose prose-lg max-w-none font-sans">
+      <slot />
+    </article>
+
+    <!-- Autor -->
+    {autor && (
+      <div class="mt-16 pt-8 border-t border-firm-border flex items-start gap-4">
+        {autor.fotoUrl && (
+          <img
+            src={`${autor.fotoUrl}?w=80&h=80&fit=crop&auto=format`}
+            alt={autor.nombre}
+            class="w-16 h-16 object-cover grayscale rounded-none flex-shrink-0"
+          />
+        )}
+        <div>
+          <p class="font-sans text-xs uppercase tracking-widest text-firm-muted mb-1">Autor</p>
+          <a href={`/equipo/${autor.slug}`} class="font-serif text-xl hover:text-firm-gold transition-colors">
+            {autor.nombre}
+          </a>
+          {autor.cargo && <p class="text-sm text-firm-muted font-sans mt-0.5">{autor.cargo}</p>}
+        </div>
+      </div>
+    )}
+
+    <!-- Relacionados -->
+    <slot name="relacionados" />
+  </div>
+</BaseLayout>

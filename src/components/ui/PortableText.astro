@@ -1,0 +1,11 @@
+﻿---
+import { marked } from 'marked';
+
+interface Props {
+  content: string;
+}
+
+const { content } = Astro.props;
+const html = await marked(content ?? '');
+---
+<div class="portable-text prose prose-lg font-sans max-w-none" set:html={html} />

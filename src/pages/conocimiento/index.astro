@@ -1,0 +1,49 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ArticleCard from '@/components/ui/ArticleCard.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import { getArticulos, getCategorias } from '@/lib/queries';
+
+const page = 1;
+const { items, totalPages } = await getArticulos(page);
+const categorias = await getCategorias();
+---
+<PageLayout titulo="Conocimiento" subtitulo="Blog jurídico">
+  <!-- Filtro categorías -->
+  {categorias.length > 0 && (
+    <div class="flex flex-wrap gap-3 mb-12 pb-6 border-b border-firm-border">
+      <a href="/conocimiento" class="text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 border border-firm-black bg-firm-black text-white">
+        Todos
+      </a>
+      {categorias.map((cat: string) => (
+        <a
+          href={`/conocimiento/categoria/${cat.toLowerCase().replace(/\s+/g, '-')}`}
+          class="text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 border border-firm-border hover:border-firm-gold hover:text-firm-gold transition-colors"
+        >
+          {cat}
+        </a>
+      ))}
+    </div>
+  )}
+
+  {items.length === 0 ? (
+    <p class="text-firm-muted font-sans">No hay artículos publicados aún.</p>
+  ) : (
+    <>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+        {items.map((a: any) => (
+          <ArticleCard
+            titulo={a.titulo}
+            slug={a.slug}
+            fechaPublicacion={a.fechaPublicacion}
+            categorias={a.categorias}
+            extracto={a.extracto}
+            imagenUrl={a.imagenUrl}
+            autorNombre={a.autorNombre}
+          />
+        ))}
+      </div>
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl="/conocimiento" />
+    </>
+  )}
+</PageLayout>

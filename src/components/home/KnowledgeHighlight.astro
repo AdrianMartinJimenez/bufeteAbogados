@@ -1,0 +1,35 @@
+---
+import ArticleCard from '@/components/ui/ArticleCard.astro';
+
+interface Articulo {
+  titulo: string;
+  slug: string;
+  fechaPublicacion?: string;
+  categorias?: string[];
+  extracto?: string;
+  imagenUrl?: string;
+  autorNombre?: string;
+}
+
+interface Props {
+  articulos: Articulo[];
+}
+
+const { articulos = [] } = Astro.props;
+---
+<section class="py-24 lg:py-32 max-w-7xl mx-auto px-6 lg:px-12">
+  <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+    <div>
+      <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.2em] mb-3">Conocimiento</p>
+      <h2 class="font-serif text-4xl lg:text-5xl font-light">Últimas publicaciones</h2>
+    </div>
+    <a href="/conocimiento" class="text-xs font-sans uppercase tracking-[0.2em] link-underline hover:text-firm-gold transition-colors self-start md:self-auto">
+      Ver todo →
+    </a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+    {articulos.map((a) => (
+      <ArticleCard {...a} />
+    ))}
+  </div>
+</section>

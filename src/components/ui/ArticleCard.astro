@@ -1,0 +1,68 @@
+---
+import { formatDate } from '@/lib/utils';
+
+interface Props {
+  titulo: string;
+  slug: string;
+  fechaPublicacion?: string;
+  categorias?: string[];
+  extracto?: string;
+  imagenUrl?: string;
+  autorNombre?: string;
+  tipo?: 'articulo' | 'noticia';
+}
+
+const {
+  titulo,
+  slug,
+  fechaPublicacion,
+  categorias = [],
+  extracto,
+  imagenUrl,
+  autorNombre,
+  tipo = 'articulo',
+} = Astro.props;
+
+const href = tipo === 'noticia' ? `/prensa/${slug}` : `/conocimiento/${slug}`;
+---
+<article class="group">
+  <a href={href} class="block">
+    <div class="aspect-video overflow-hidden mb-4">
+      {imagenUrl ? (
+        <img
+          src={`${imagenUrl}?w=600&h=340&fit=crop&auto=format&fm=webp`}
+          alt={titulo}
+          class="w-full h-full object-cover img-grayscale transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div class="w-full h-full bg-firm-border"></div>
+      )}
+    </div>
+  </a>
+  <div class="flex items-center gap-3 mb-3">
+    {categorias.slice(0, 2).map((cat: string) => (
+      <a
+        href={`/conocimiento/categoria/${cat.toLowerCase().replace(/\s+/g, '-')}`}
+        class="text-[10px] font-sans uppercase tracking-[0.15em] text-firm-gold hover:underline"
+      >
+        {cat}
+      </a>
+    ))}
+    {fechaPublicacion && (
+      <time class="text-[10px] font-sans text-firm-muted ml-auto">{formatDate(fechaPublicacion)}</time>
+    )}
+  </div>
+  <a href={href}>
+    <h3 class="font-serif text-xl font-light leading-snug hover:text-firm-gold transition-colors mb-2">
+      {titulo}
+    </h3>
+  </a>
+  {extracto && (
+    <p class="text-sm font-sans text-firm-muted leading-relaxed line-clamp-3">{extracto}</p>
+  )}
+  {autorNombre && (
+    <p class="text-xs font-sans text-firm-muted mt-3">{autorNombre}</p>
+  )}
+</article>

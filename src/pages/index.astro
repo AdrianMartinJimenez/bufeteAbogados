@@ -1,0 +1,80 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import AboutSection from '@/components/home/AboutSection.astro';
+import ServicesHighlight from '@/components/home/ServicesHighlight.astro';
+import SectorsHighlight from '@/components/home/SectorsHighlight.astro';
+import TeamHighlight from '@/components/home/TeamHighlight.astro';
+import KnowledgeHighlight from '@/components/home/KnowledgeHighlight.astro';
+import BadgesSection from '@/components/home/BadgesSection.astro';
+import CtaSection from '@/components/home/CtaSection.astro';
+import { getConfiguracion, getArticulosRecientes } from '@/lib/queries';
+
+const config = await getConfiguracion();
+const articulos = await getArticulosRecientes(3);
+---
+<BaseLayout
+  seo={{
+    titulo: config?.seoTitulo,
+    descripcion: config?.seoDescripcion,
+    imagen: config?.seoImagenUrl,
+  }}
+>
+  <Hero
+    titulo={config?.heroTitulo ?? 'Derecho. Excelencia. Confianza.'}
+    subtitulos={config?.heroSubtitulos ?? []}
+    descripcion={config?.heroDescripcion}
+    ctaTexto={config?.heroCtaTexto}
+    ctaEnlace={config?.heroCtaEnlace ?? '/contacto'}
+    imagenUrl={config?.heroImagen?.url}
+  />
+
+  <AboutSection
+    titulo={config?.sobreTitulo}
+    contenido={config?.sobreContenido}
+    ctaTexto={config?.sobreCtaTexto}
+    ctaEnlace={config?.sobreCtaEnlace}
+    imagenUrl={config?.sobreImagen?.url}
+  />
+
+  {config?.serviciosDestacados?.length > 0 && (
+    <ServicesHighlight
+      titulo={config!.serviciosTitulo}
+      servicios={config!.serviciosDestacados}
+    />
+  )}
+
+  {config?.sectoresDestacados?.length > 0 && (
+    <SectorsHighlight
+      titulo={config!.sectoresTitulo}
+      sectores={config!.sectoresDestacados}
+    />
+  )}
+
+  {config?.equipoDestacado?.length > 0 && (
+    <TeamHighlight
+      titulo={config!.equipoTitulo}
+      miembros={config!.equipoDestacado}
+    />
+  )}
+
+  {config?.badges?.length > 0 && (
+    <BadgesSection
+      titulo={config!.reconocimientosTitulo}
+      badges={config!.badges}
+    />
+  )}
+
+  {articulos?.length > 0 && (
+    <KnowledgeHighlight articulos={articulos as any[]} />
+  )}
+
+  <CtaSection
+    titulo={config?.ctaTitulo}
+    subtitulo={config?.ctaSubtitulo}
+    boton1Texto={config?.ctaBoton1Texto}
+    boton1Enlace={config?.ctaBoton1Enlace}
+    boton2Texto={config?.ctaBoton2Texto}
+    boton2Enlace={config?.ctaBoton2Enlace}
+  />
+</BaseLayout>

@@ -1,0 +1,45 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import TeamCard from '@/components/ui/TeamCard.astro';
+import { getAllMiembros } from '@/lib/queries';
+
+const todos = await getAllMiembros();
+
+// Agrupar por categoría
+const categorias: Record<string, any[]> = {};
+const orden = ['socio', 'of-counsel', 'asociado', 'marketing', 'administracion'];
+const labels: Record<string, string> = {
+  socio: 'Socios',
+  'of-counsel': 'Of Counsel',
+  asociado: 'Asociados',
+  marketing: 'Marketing & Comunicación',
+  administracion: 'Administración',
+};
+
+for (const m of todos) {
+  const cat = (m as any).categoria ?? 'asociado';
+  if (!categorias[cat]) categorias[cat] = [];
+  categorias[cat].push(m);
+}
+---
+<PageLayout titulo="Nuestro equipo" subtitulo="Equipo">
+  {orden.filter((cat) => categorias[cat]?.length > 0).map((cat) => (
+    <div class="mb-20">
+      <h2 class="font-serif text-2xl font-light border-b border-firm-border pb-4 mb-10">
+        {labels[cat] ?? cat}
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+        {categorias[cat].map((m: any) => (
+          <TeamCard
+            nombre={m.nombre}
+            slug={m.slug}
+            cargo={m.cargo}
+            categoria={m.categoria}
+            fotoUrl={m.fotoUrl}
+            especialidades={m.especialidades}
+          />
+        ))}
+      </div>
+    </div>
+  ))}
+</PageLayout>

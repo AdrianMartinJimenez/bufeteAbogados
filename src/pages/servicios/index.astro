@@ -1,0 +1,24 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { getAllServicios } from '@/lib/queries';
+
+const servicios = await getAllServicios();
+---
+<PageLayout titulo="Áreas de práctica" subtitulo="Servicios">
+  {servicios.length === 0 ? (
+    <p class="text-firm-muted font-sans">No hay servicios disponibles.</p>
+  ) : (
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {servicios.map((s: any) => (
+        <ServiceCard
+          titulo={s.titulo}
+          slug={s.slug}
+          descripcionCorta={s.descripcionCorta}
+          icono={s.icono}
+          imagenUrl={s.imagenUrl}
+        />
+      ))}
+    </div>
+  )}
+</PageLayout>

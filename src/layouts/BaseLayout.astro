@@ -1,0 +1,82 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import CookieBanner from '@/components/interactive/CookieBanner';
+import '@/styles/global.css';
+
+interface Props {
+  seo?: {
+    titulo?: string;
+    descripcion?: string;
+    imagen?: string;
+    tipo?: string;
+  };
+}
+
+const { seo = {} } = Astro.props;
+const siteName = 'Despacho de Abogados';
+const titulo = seo.titulo ? `${seo.titulo} | ${siteName}` : siteName;
+const descripcion = seo.descripcion || 'Despacho de abogados especializado en reestructuraciones, penal económico y derecho del arte.';
+const imagen = seo.imagen || '/og-default.jpg';
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://bufete.com');
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:image" content={imagen} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:type" content={seo.tipo ?? 'website'} />
+    <meta property="og:site_name" content={siteName} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={imagen} />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LegalService",
+        "name": "Despacho de Abogados",
+        "url": "https://bufete.com",
+        "description": "Despacho especializado en reestructuraciones, penal económico y derecho del arte.",
+        "areaServed": ["España", "Internacional"],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Calle Serrano, 41",
+          "addressLocality": "Madrid",
+          "postalCode": "28001",
+          "addressCountry": "ES"
+        },
+        "telephone": "+34910000000"
+      }
+    </script>
+
+    <ViewTransitions />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-to-content">Saltar al contenido</a>
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+    <CookieBanner client:load />
+  </body>
+</html>

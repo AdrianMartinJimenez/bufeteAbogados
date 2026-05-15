@@ -1,0 +1,107 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PortableText from '@/components/ui/PortableText.astro';
+import { getMiembroBySlug } from '@/lib/queries';
+
+const { slug } = Astro.params;
+const m = await getMiembroBySlug(slug!);
+
+if (!m) return Astro.redirect('/equipo', 301);
+---
+<BaseLayout seo={{ titulo: m.nombre, descripcion: m.resumenCorto }}>
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
+    <!-- Volver -->
+    <a href="/equipo" class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted hover:text-firm-gold transition-colors mb-12 block">
+      ← Equipo
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-20">
+      <!-- Foto -->
+      <div>
+        {m.fotoUrl ? (
+          <img
+            src={`${m.fotoUrl}?w=500&h=650&fit=crop&auto=format&fm=webp`}
+            alt={m.nombre}
+            class="w-full aspect-[5/6] object-cover img-grayscale"
+            loading="eager"
+          />
+        ) : (
+          <div class="w-full aspect-[5/6] bg-firm-border flex items-center justify-center">
+            <span class="font-serif text-6xl text-firm-muted">{m.nombre[0]}</span>
+          </div>
+        )}
+
+        <!-- Contacto -->
+        <div class="mt-6 space-y-3">
+          {m.email && (
+            <a href={`mailto:${m.email}`} class="flex items-center gap-2 text-sm font-sans text-firm-muted hover:text-firm-gold transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {m.email}
+            </a>
+          )}
+          {m.linkedin && (
+            <a href={m.linkedin} target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm font-sans text-firm-muted hover:text-firm-gold transition-colors">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452z"/>
+              </svg>
+              LinkedIn
+            </a>
+          )}
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="lg:col-span-2">
+        <p class="text-firm-gold text-xs font-sans uppercase tracking-[0.2em] mb-3">{m.cargo}</p>
+        <h1 class="font-serif text-5xl lg:text-6xl font-light mb-6">{m.nombre}</h1>
+
+        {m.resumenCorto && (
+          <p class="text-xl font-sans text-firm-muted leading-relaxed mb-10 border-l-2 border-firm-gold pl-6">{m.resumenCorto}</p>
+        )}
+
+        {m.especialidades?.length > 0 && (
+          <div class="mb-10">
+            <p class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted mb-3">Especialidades</p>
+            <div class="flex flex-wrap gap-2">
+              {m.especialidades.map((esp: string) => (
+                <span class="text-xs font-sans border border-firm-border px-3 py-1 text-firm-muted">
+                  {esp}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {m.idiomas?.length > 0 && (
+          <div class="mb-10">
+            <p class="text-xs font-sans uppercase tracking-[0.2em] text-firm-muted mb-3">Idiomas</p>
+            <p class="font-sans text-sm text-firm-muted">{m.idiomas.join(' · ')}</p>
+          </div>
+        )}
+
+        {m.biografia && (
+          <div class="mb-10">
+            <h2 class="font-serif text-2xl font-light mb-6">Biografía</h2>
+            <PortableText content={m.biografia} />
+          </div>
+        )}
+
+        {m.educacion?.length > 0 && (
+          <div>
+            <h2 class="font-serif text-2xl font-light mb-6">Formación académica</h2>
+            <ul class="space-y-4">
+              {m.educacion.map((e: any) => (
+                <li class="border-b border-firm-border pb-4">
+                  <p class="font-sans font-medium text-sm">{e.titulo}</p>
+                  <p class="font-sans text-sm text-firm-muted">{e.institucion}{e.anio ? ` · ${e.anio}` : ''}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

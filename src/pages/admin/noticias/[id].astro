@@ -1,0 +1,83 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getNoticiaById, updateNoticia } from '../../../lib/queries';
+
+const id = Number(Astro.params.id);
+if (!id) return Astro.redirect('/admin/noticias');
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  try {
+    const form = await Astro.request.formData();
+    await updateNoticia(id, {
+      titulo: form.get('titulo'), slug: form.get('slug'),
+      publicado: form.get('publicado') === 'on',
+      fechaPublicacion: form.get('fecha_publicacion'),
+      fuenteExterna: form.get('fuente_externa'), enlaceExterno: form.get('enlace_externo'),
+      imagenUrl: form.get('imagen_url'), imagenAlt: form.get('imagen_alt'),
+      extracto: form.get('extracto'), contenido: form.get('contenido'),
+      seoTitulo: form.get('seo_titulo'), seoDescripcion: form.get('seo_descripcion'),
+    });
+    return Astro.redirect('/admin/noticias');
+  } catch (e: any) { error = e.message ?? 'Error al guardar'; }
+}
+
+const n = await getNoticiaById(id);
+if (!n) return Astro.redirect('/admin/noticias');
+---
+<AdminLayout title={`Editar: ${n.titulo}`}>
+  <style>
+    form { max-width: 800px; }
+    .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #6B6B6B; border-bottom: 1px solid #E2E0DB; padding-bottom: 0.5rem; margin: 2rem 0 1.25rem; }
+    .section-title:first-of-type { margin-top: 0; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; color: #0A0A0A; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    label small { text-transform: none; letter-spacing: normal; font-weight: 400; color: #6B6B6B; }
+    input[type="text"], input[type="url"], input[type="date"], textarea {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid #E2E0DB;
+      padding: 0.5rem 0; font-size: 0.9375rem; color: #0A0A0A; outline: none;
+      transition: border-color 0.2s; font-family: 'Inter', sans-serif;
+    }
+    input:focus, textarea:focus { border-color: #0A0A0A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .check-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-transform: none; letter-spacing: normal; font-size: 0.875rem; }
+    .check-label input { width: auto; border: none; border-bottom: none; }
+    .error-msg { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 1.5rem; }
+    .actions { display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; }
+    .btn-save { background: #0A0A0A; color: #F8F7F4; border: none; padding: 0.875rem 2rem; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-cancel { color: #6B6B6B; text-decoration: none; font-size: 0.8125rem; }
+    .preview-link { font-size: 0.8125rem; color: #C9A84C; text-decoration: none; }
+  </style>
+
+  {error && <div class="error-msg">{error}</div>}
+  <div style="margin-bottom:1rem"><a href={`/prensa/${n.slug}`} target="_blank" class="preview-link">Ver en el sitio ↗</a></div>
+
+  <form method="POST">
+    <p class="section-title">Información principal</p>
+    <div class="field"><label>Título *</label><input type="text" name="titulo" value={n.titulo} required /></div>
+    <div class="field"><label>Slug *</label><input type="text" name="slug" value={n.slug} required pattern="[a-z0-9\-]+" /></div>
+    <div class="field"><label>Fecha</label><input type="date" name="fecha_publicacion" value={n.fechaPublicacion} style="max-width:200px" /></div>
+    <div class="grid-2">
+      <div class="field"><label>Fuente externa</label><input type="text" name="fuente_externa" value={n.fuenteExterna ?? ''} /></div>
+      <div class="field"><label>Enlace externo</label><input type="url" name="enlace_externo" value={n.enlaceExterno ?? ''} /></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Imagen (URL)</label><input type="url" name="imagen_url" value={n.imagenUrl ?? ''} /></div>
+      <div class="field"><label>Alt de la imagen</label><input type="text" name="imagen_alt" value={n.imagenAlt ?? ''} /></div>
+    </div>
+    <div class="field"><label>Extracto</label><textarea name="extracto" style="min-height:70px">{n.extracto ?? ''}</textarea></div>
+    <div class="field"><label>Contenido <small>(Markdown)</small></label><textarea name="contenido" style="min-height:200px">{n.contenido ?? ''}</textarea></div>
+
+    <p class="section-title">SEO</p>
+    <div class="field"><label>Título SEO</label><input type="text" name="seo_titulo" value={n.seoTitulo ?? ''} /></div>
+    <div class="field"><label>Descripción SEO</label><textarea name="seo_descripcion" style="min-height:60px">{n.seoDescripcion ?? ''}</textarea></div>
+
+    <div class="actions">
+      <button type="submit" class="btn-save">Guardar cambios</button>
+      <label class="check-label"><input type="checkbox" name="publicado" checked={n.publicado === 1} /> Publicada</label>
+      <a href="/admin/noticias" class="btn-cancel">Cancelar</a>
+    </div>
+  </form>
+</AdminLayout>

@@ -1,0 +1,35 @@
+---
+interface Props {
+  titulo: string;
+  slug: string;
+  descripcionCorta?: string;
+  imagenUrl?: string;
+  colorAccento?: string;
+}
+
+const { titulo, slug, descripcionCorta, imagenUrl } = Astro.props;
+---
+<a href={`/sectores/${slug}`} class="group relative block aspect-[4/3] overflow-hidden">
+  {imagenUrl ? (
+    <img
+      src={`${imagenUrl}?w=600&h=450&fit=crop&auto=format&fm=webp`}
+      alt={titulo}
+      class="absolute inset-0 w-full h-full object-cover img-grayscale transition-transform duration-500 group-hover:scale-105"
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <div class="absolute inset-0 bg-firm-black/80"></div>
+  )}
+  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+  <div class="absolute bottom-0 left-0 right-0 p-6">
+    <h3 class="font-serif text-xl text-white font-light group-hover:text-firm-gold transition-colors duration-300">
+      {titulo}
+    </h3>
+    {descripcionCorta && (
+      <p class="text-white/60 text-xs font-sans mt-1 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {descripcionCorta}
+      </p>
+    )}
+  </div>
+</a>

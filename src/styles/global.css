@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: #0A0A0A;
+  background-color: #F8F7F4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Skip to content */
+.skip-to-content {
+  @apply absolute -translate-y-full focus:translate-y-0 left-4 top-4 z-[100] bg-firm-black text-firm-white px-4 py-2 text-sm font-sans transition-transform;
+}
+
+/* Animated underline for links */
+.link-underline {
+  @apply relative;
+}
+.link-underline::after {
+  content: '';
+  @apply absolute left-0 -bottom-0.5 w-full h-px bg-current origin-left scale-x-0 transition-transform duration-300;
+}
+.link-underline:hover::after {
+  @apply scale-x-100;
+}
+
+/* Gold animated border top for cards */
+.card-gold-top {
+  @apply relative;
+}
+.card-gold-top::before {
+  content: '';
+  @apply absolute top-0 left-0 w-full h-px bg-firm-gold origin-left scale-x-0 transition-transform duration-300;
+}
+.card-gold-top:hover::before {
+  @apply scale-x-100;
+}
+
+/* Focus ring */
+*:focus-visible {
+  @apply outline-none ring-2 ring-firm-gold ring-offset-2;
+}
+
+/* Smooth image grayscale transition */
+.img-grayscale {
+  @apply grayscale transition-all duration-500;
+}
+.img-grayscale:hover {
+  @apply grayscale-0;
+}
