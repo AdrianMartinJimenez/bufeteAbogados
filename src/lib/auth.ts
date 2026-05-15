@@ -5,7 +5,7 @@ export const COOKIE_NAME = 'admin_token';
 const MAX_AGE = 60 * 60 * 8; // 8 horas
 
 function getSecret(): Uint8Array {
-  const secret = import.meta.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET ?? import.meta.env.JWT_SECRET;
   if (!secret || secret.length < 32) throw new Error('JWT_SECRET debe tener al menos 32 caracteres');
   return new TextEncoder().encode(secret);
 }
