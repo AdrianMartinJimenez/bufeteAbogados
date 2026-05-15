@@ -3,4 +3,4 @@ builder = "nixpacks"
 buildCommand = "npm install && npm run build"
 
 [deploy]
-startCommand = "node dist/server/entry.mjs"
+startCommand = "HOST=0.0.0.0 node dist/server/entry.mjs"
