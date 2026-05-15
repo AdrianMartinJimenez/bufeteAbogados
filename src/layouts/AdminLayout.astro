@@ -113,8 +113,8 @@ const { title } = Astro.props;
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; }
       .admin-menu-btn { display: flex; align-items: center; }
-      .content { padding: 1.25rem; }
-      .topbar { padding: 0.875rem 1.25rem; }
+      .content { padding: 1.25rem; overflow-x: hidden; }
+      .topbar { padding: 0.875rem 1.25rem; position: sticky; top: 0; z-index: 30; }
     }
 
     /* Forms & tables global overrides */
@@ -125,7 +125,16 @@ const { title } = Astro.props;
 
     /* Tablas responsive */
     @media (max-width: 767px) {
-      table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      :global(table) { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; min-width: 520px; }
+      :global(.page-header) {
+        position: sticky;
+        top: 49px;
+        z-index: 20;
+        background: #F8F7F4;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.75rem !important;
+      }
     }
   </style>
   <slot name="head" />
