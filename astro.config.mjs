@@ -8,6 +8,7 @@ export default defineConfig({
   site: 'https://bufete.com',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
+  security: { checkOrigin: false },
   integrations: [
     react(),
     tailwind({ applyBaseStyles: false }),
