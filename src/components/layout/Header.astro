@@ -16,13 +16,12 @@ const navItems = [
 ---
 <header
   id="site-header"
-  class="sticky top-0 z-50 transition-all duration-300 text-firm-black"
-  data-transparent={pathname === '/'}}
+  class="sticky top-0 z-50 bg-firm-white border-b border-firm-border text-firm-black"
 >
   <div class="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-16 lg:h-20">
     <!-- Logo -->
     <a href="/" class="font-serif text-xl lg:text-2xl tracking-widest uppercase flex-shrink-0" aria-label="Inicio — Despacho de Abogados">
-      <span id="header-logo">DESPACHO</span>
+      <span>DESPACHO</span>
     </a>
 
     <!-- Navegación desktop -->
@@ -109,29 +108,4 @@ const navItems = [
   sectores={sectores.map((s: any) => ({ titulo: s.titulo, slug: s.slug }))}
 />
 
-<script>
-  // Transparencia del header en home
-  const header = document.getElementById('site-header');
-  const isHome = header?.dataset.transparent !== undefined;
 
-  function updateHeader() {
-    if (!header) return;
-    const logo = document.getElementById('header-logo');
-    if (isHome && window.scrollY < 80) {
-      header.classList.remove('bg-firm-white', 'border-b', 'border-firm-border', 'text-firm-black');
-      header.classList.add('text-white');
-      if (logo) logo.style.color = 'white';
-    } else {
-      header.classList.add('bg-firm-white', 'border-b', 'border-firm-border', 'text-firm-black');
-      header.classList.remove('text-white');
-      if (logo) logo.style.color = '';
-    }
-  }
-
-  if (isHome) {
-    updateHeader();
-    window.addEventListener('scroll', updateHeader, { passive: true });
-  } else {
-    header?.classList.add('bg-firm-white', 'border-b', 'border-firm-border', 'text-firm-black');
-  }
-</script>

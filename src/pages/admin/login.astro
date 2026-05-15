@@ -14,24 +14,29 @@ if (cookie?.value) {
 let error = '';
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
-  const email = String(form.get('email') ?? '').trim().toLowerCase();
+  const email = String(form.get('email') ?? '').trim();
   const password = String(form.get('password') ?? '');
 
   if (!email || !password) {
-    error = 'Por favor, introduce email y contraseña.';
+    error = 'Por favor, introduce usuario y contraseña.';
   } else {
     const dbUser = await getUserByEmail(email);
     if (!dbUser) {
-      error = 'Email o contraseña incorrectos.';
+      error = 'Usuario o contraseña incorrectos.';
     } else {
       const valid = await verifyPassword(password, dbUser.passwordHash);
       if (!valid) {
-        error = 'Email o contraseña incorrectos.';
+        error = 'Usuario o contraseña incorrectos.';
       } else {
         const token = await createToken(dbUser.id, dbUser.email);
         const cookieHeader = authCookie(token);
-        Astro.response.headers.set('Set-Cookie', cookieHeader);
-        return Astro.redirect('/admin');
+        return new Response(null, {
+          status: 302,
+          headers: {
+            'Location': '/admin',
+            'Set-Cookie': cookieHeader,
+          },
+        });
       }
     }
   }
@@ -62,7 +67,7 @@ if (Astro.request.method === 'POST') {
     p.subtitle { font-size: 0.8125rem; color: #6B6B6B; margin-bottom: 2rem; }
     label { display: block; font-size: 0.75rem; font-weight: 500; color: #0A0A0A;
             text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-    input[type="email"], input[type="password"] {
+    input[type="text"], input[type="password"] {
       width: 100%; background: transparent; border: none;
       border-bottom: 1px solid #E2E0DB;
       padding: 0.625rem 0; font-size: 0.9375rem; color: #0A0A0A;
@@ -96,8 +101,8 @@ if (Astro.request.method === 'POST') {
 
     <form method="POST">
       <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email" />
+        <label for="email">Usuario</label>
+        <input type="text" id="email" name="email" required autocomplete="username" />
       </div>
       <div class="field">
         <label for="password">Contraseña</label>

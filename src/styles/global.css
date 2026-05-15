@@ -21,11 +21,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Skip to content */
-.skip-to-content {
-  @apply absolute -translate-y-full focus:translate-y-0 left-4 top-4 z-[100] bg-firm-black text-firm-white px-4 py-2 text-sm font-sans transition-transform;
-}
-
 /* Animated underline for links */
 .link-underline {
   @apply relative;

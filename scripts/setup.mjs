@@ -53,12 +53,12 @@ for (const stmt of statements) {
 console.log('✅  Tablas creadas');
 
 // Crear usuario admin inicial
-const email = process.env.ADMIN_EMAIL || 'admin@bufete.com';
-const password = process.env.ADMIN_PASSWORD || 'admin123';
+const email = process.env.ADMIN_EMAIL || 'admin';
+const password = process.env.ADMIN_PASSWORD || 'admin';
 const hash = await bcrypt.hash(password, 12);
 
 await db.execute({
-  sql: 'INSERT OR IGNORE INTO usuarios (email, password_hash, nombre) VALUES (?, ?, ?)',
+  sql: 'INSERT OR REPLACE INTO usuarios (email, password_hash, nombre) VALUES (?, ?, ?)',
   args: [email, hash, 'Administrador'],
 });
 
