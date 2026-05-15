@@ -45,21 +45,21 @@ const [articulos, serviciosDestacados, sectoresDestacados, equipoDestacado] = aw
   {serviciosDestacados.length > 0 && (
     <ServicesHighlight
       titulo={config?.serviciosTitulo}
-      servicios={serviciosDestacados}
+      servicios={serviciosDestacados as any}
     />
   )}
 
   {sectoresDestacados.length > 0 && (
     <SectorsHighlight
       titulo={config?.sectoresTitulo}
-      sectores={sectoresDestacados}
+      sectores={sectoresDestacados as any}
     />
   )}
 
   {equipoDestacado.length > 0 && (
     <TeamHighlight
       titulo={config?.equipoTitulo}
-      miembros={equipoDestacado}
+      miembros={equipoDestacado as any}
     />
   )}
 
