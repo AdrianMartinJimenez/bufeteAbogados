@@ -52,10 +52,12 @@ await db.execute({
     hero_descripcion = ?,
     hero_cta_texto = ?,
     hero_cta_enlace = ?,
+    hero_imagen_url = ?,
     sobre_titulo = ?,
     sobre_contenido = ?,
     sobre_cta_texto = ?,
     sobre_cta_enlace = ?,
+    sobre_imagen_url = ?,
     servicios_titulo = ?,
     sectores_titulo = ?,
     equipo_titulo = ?,
@@ -82,6 +84,7 @@ await db.execute({
     'Despacho de abogados con vocación de excelencia. Ofrecemos soluciones jurídicas precisas, estratégicas y adaptadas a la realidad de cada cliente.',
     'Consultar con el despacho',
     '/contacto',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab',
     'Un despacho fundado en la excelencia',
     `Martínez & Asociados nació en 2003 con una premisa clara: ofrecer asesoramiento jurídico de la más alta calidad a empresas e instituciones que exigen resultados.
 
@@ -90,6 +93,7 @@ Desde nuestra fundación hemos gestionado más de 1.200 asuntos, representado a 
 Nuestra forma de trabajar combina el rigor técnico con una visión estratégica del negocio. Entendemos que cada decisión jurídica tiene consecuencias económicas, por eso actuamos como socios de confianza, no solo como asesores legales.`,
     'Conocer el equipo',
     '/equipo',
+    'https://images.unsplash.com/photo-1497366216548-37526070297c',
     'Áreas de práctica',
     'Sectores de actividad',
     'Nuestro equipo',
@@ -121,6 +125,7 @@ const servicios = [
     titulo: 'Derecho Corporativo y M&A',
     slug: 'derecho-corporativo-ma',
     descripcion_corta: 'Asesoramiento integral en operaciones de fusiones, adquisiciones, reestructuraciones y gobierno corporativo.',
+    imagen_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216',
     contenido: `## Asesoramiento corporativo de primer nivel
 
 Nuestro equipo de derecho corporativo acompaña a empresas en todas las fases de su ciclo de vida: desde la constitución y estructuración hasta las operaciones más complejas de fusiones y adquisiciones.
@@ -144,6 +149,7 @@ Hemos asesorado en más de 200 operaciones de M&A, con un volumen agregado super
     titulo: 'Derecho Fiscal',
     slug: 'derecho-fiscal',
     descripcion_corta: 'Planificación fiscal, cumplimiento tributario y defensa ante la Administración y los tribunales.',
+    imagen_url: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f',
     contenido: `## Fiscalidad empresarial y personal
 
 El área fiscal de Martínez & Asociados ofrece un servicio integral que cubre tanto la planificación preventiva como la defensa contenciosa frente a la Administración Tributaria.
@@ -167,6 +173,7 @@ Entendemos la fiscalidad como una herramienta estratégica. Trabajamos de forma 
     titulo: 'Litigación y Arbitraje',
     slug: 'litigacion-arbitraje',
     descripcion_corta: 'Defensa en procedimientos judiciales complejos y arbitrajes nacionales e internacionales.',
+    imagen_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f',
     contenido: `## Litigación estratégica
 
 Nuestro equipo de litigación está formado por abogados con amplia experiencia en procedimientos complejos ante todos los órdenes jurisdiccionales y en los principales centros de arbitraje internacionales.
@@ -190,6 +197,7 @@ Más de 95% de asuntos resueltos favorablemente en primera o segunda instancia d
     titulo: 'Derecho Laboral',
     slug: 'derecho-laboral',
     descripcion_corta: 'Relaciones laborales, negociación colectiva, ERES y asesoramiento en recursos humanos.',
+    imagen_url: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d',
     contenido: `## Relaciones laborales y empleo
 
 Asesoramos a empresas en la gestión de sus relaciones laborales, desde el diseño de la política de recursos humanos hasta la resolución de conflictos colectivos.
@@ -209,6 +217,7 @@ Asesoramos a empresas en la gestión de sus relaciones laborales, desde el dise�
     titulo: 'Derecho Inmobiliario',
     slug: 'derecho-inmobiliario',
     descripcion_corta: 'Transacciones inmobiliarias, due diligence, promoción y financiación de proyectos.',
+    imagen_url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa',
     contenido: `## Inmobiliario y urbanismo
 
 Asesoramos en todas las fases del negocio inmobiliario: adquisición, financiación, gestión, desarrollo y desinversión de activos.
@@ -228,6 +237,7 @@ Asesoramos en todas las fases del negocio inmobiliario: adquisición, financiaci
     titulo: 'Derecho Concursal',
     slug: 'derecho-concursal',
     descripcion_corta: 'Reestructuración de deuda, acuerdos extrajudiciales y administración concursal.',
+    imagen_url: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85',
     contenido: `## Reestructuración e insolvencia
 
 Cuando una empresa atraviesa dificultades financieras, la rapidez y la estrategia jurídica son determinantes. Nuestro equipo ofrece soluciones tanto preventivas como reactivas.
@@ -246,9 +256,9 @@ Cuando una empresa atraviesa dificultades financieras, la rapidez y la estrategi
 
 for (const s of servicios) {
   await db.execute({
-    sql: `INSERT OR REPLACE INTO servicios (titulo, slug, descripcion_corta, contenido, orden, destacado)
-          VALUES (?, ?, ?, ?, ?, ?)`,
-    args: [s.titulo, s.slug, s.descripcion_corta, s.contenido, s.orden, s.destacado],
+    sql: `INSERT OR REPLACE INTO servicios (titulo, slug, descripcion_corta, imagen_url, contenido, orden, destacado)
+          VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    args: [s.titulo, s.slug, s.descripcion_corta, s.imagen_url ?? null, s.contenido, s.orden, s.destacado],
   });
 }
 
@@ -261,6 +271,7 @@ const sectores = [
     titulo: 'Tecnología e Innovación',
     slug: 'tecnologia-innovacion',
     descripcion_corta: 'Asesoramiento jurídico especializado para empresas tecnológicas, startups y fondos de venture capital.',
+    imagen_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
     contenido: `## Derecho para el sector tecnológico
 
 El ecosistema tecnológico tiene unas necesidades jurídicas propias. Acompañamos a startups, scale-ups y grandes empresas tecnológicas en todos los hitos de su crecimiento.
@@ -278,6 +289,7 @@ El ecosistema tecnológico tiene unas necesidades jurídicas propias. Acompañam
     titulo: 'Energía y Recursos Naturales',
     slug: 'energia-recursos-naturales',
     descripcion_corta: 'Proyectos de energías renovables, regulación del sector energético y financiación de infraestructuras.',
+    imagen_url: 'https://images.unsplash.com/photo-1509391366360-2e959784a276',
     contenido: `## Derecho energético
 
 La transición energética genera oportunidades y complejidades regulatorias únicas. Nuestro equipo tiene una profunda experiencia en el sector.
@@ -295,6 +307,7 @@ La transición energética genera oportunidades y complejidades regulatorias ún
     titulo: 'Banca y Mercados de Capitales',
     slug: 'banca-mercados-capitales',
     descripcion_corta: 'Financiación estructurada, regulación bancaria y operaciones en mercados de capitales.',
+    imagen_url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3',
     contenido: `## Sector financiero y bancario
 
 Asesoramos a entidades financieras, fondos de inversión y empresas en sus operaciones en los mercados de capitales y en el cumplimiento de la normativa bancaria.
@@ -312,6 +325,7 @@ Asesoramos a entidades financieras, fondos de inversión y empresas en sus opera
     titulo: 'Inmobiliario y Construcción',
     slug: 'inmobiliario-construccion',
     descripcion_corta: 'Promotoras, fondos inmobiliarios, constructoras y gestoras de activos.',
+    imagen_url: 'https://images.unsplash.com/photo-1486325212027-8081e485255e',
     contenido: `## El sector inmobiliario, desde dentro
 
 Conocemos la industria inmobiliaria en profundidad y ofrecemos asesoramiento integral a todos sus actores: promotores, inversores, gestoras y entidades financiadoras.
@@ -328,6 +342,7 @@ Conocemos la industria inmobiliaria en profundidad y ofrecemos asesoramiento int
     titulo: 'Farmacéutico y Ciencias de la Vida',
     slug: 'farmaceutico-ciencias-vida',
     descripcion_corta: 'Regulación sanitaria, patentes, licencias y operaciones corporativas en el sector salud.',
+    imagen_url: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69',
     contenido: `## Ciencias de la vida y salud
 
 El sector farmacéutico y de ciencias de la vida combina una fuerte regulación con un dinamismo corporativo creciente. Nuestro equipo cuenta con especialistas en ambas vertientes.
@@ -345,6 +360,7 @@ El sector farmacéutico y de ciencias de la vida combina una fuerte regulación 
     titulo: 'Medios y Entretenimiento',
     slug: 'medios-entretenimiento',
     descripcion_corta: 'Propiedad intelectual, contratos de producción, distribución y licencias en la industria creativa.',
+    imagen_url: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d',
     contenido: `## Industria creativa y medios digitales
 
 La economía creativa requiere una protección jurídica sofisticada. Asesoramos a productoras, sellos discográficos, plataformas digitales y creadores de contenido.
@@ -362,9 +378,9 @@ La economía creativa requiere una protección jurídica sofisticada. Asesoramos
 
 for (const s of sectores) {
   await db.execute({
-    sql: `INSERT OR REPLACE INTO sectores (titulo, slug, descripcion_corta, contenido, orden)
-          VALUES (?, ?, ?, ?, ?)`,
-    args: [s.titulo, s.slug, s.descripcion_corta, s.contenido, s.orden],
+    sql: `INSERT OR REPLACE INTO sectores (titulo, slug, descripcion_corta, imagen_url, contenido, orden)
+          VALUES (?, ?, ?, ?, ?, ?)`,
+    args: [s.titulo, s.slug, s.descripcion_corta, s.imagen_url ?? null, s.contenido, s.orden],
   });
 }
 
@@ -378,6 +394,7 @@ const miembros = [
     slug: 'nicolas-martinez-vidal',
     cargo: 'Socio Fundador',
     categoria: 'socio',
+    foto_url: 'https://images.unsplash.com/photo-1560250097-0dc05ae4be08',
     email: 'n.martinez@bufete.com',
     resumen_corto: 'Fundador del despacho y referente en derecho corporativo y M&A con más de 25 años de experiencia.',
     biografia: `Nicolás Martínez fundó el despacho en 2003 tras una larga trayectoria en firmas internacionales de primer nivel en Madrid, Londres y Nueva York.
@@ -400,6 +417,7 @@ Ha sido reconocido de forma ininterrumpida desde 2010 en Chambers Europe (Band 1
     slug: 'elena-casado-romero',
     cargo: 'Socia',
     categoria: 'socio',
+    foto_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2',
     email: 'e.casado@bufete.com',
     resumen_corto: 'Socia responsable del área fiscal. Especialista en fiscalidad internacional y precios de transferencia.',
     biografia: `Elena Casado se incorporó al despacho en 2008 y es socia desde 2015. Dirige el área fiscal con especial foco en planificación internacional y operaciones transfronterizas.
@@ -422,6 +440,7 @@ Es autora de múltiples artículos en publicaciones jurídicas especializadas y 
     slug: 'javier-ortega-puente',
     cargo: 'Socio',
     categoria: 'socio',
+    foto_url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7',
     email: 'j.ortega@bufete.com',
     resumen_corto: 'Responsable del área de litigación y arbitraje internacional. Más de 18 años en procedimientos complejos.',
     biografia: `Javier Ortega lidera el área de litigación del despacho desde 2012. Con formación en Londres y experiencia en arbitrajes ante la ICC, el CIADI y la CCI, es uno de los árbitros y abogados litigantes más reconocidos de España.
@@ -443,6 +462,7 @@ Es miembro del Club Español del Arbitraje y árbitro designado en numerosos pan
     slug: 'ana-blanco-ferreira',
     cargo: 'Socia',
     categoria: 'socio',
+    foto_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956',
     email: 'a.blanco@bufete.com',
     resumen_corto: 'Especialista en derecho laboral y relaciones colectivas. Asesora a grandes empresas en reestructuraciones de plantilla.',
     biografia: `Ana Blanco se incorporó al despacho en 2010 procedente de una firma internacional donde desarrolló su carrera en el área de empleo. Es socia desde 2018.
@@ -462,6 +482,7 @@ Asesora a empresas del Ibex 35 y multinacionales en negociaciones colectivas, ER
     slug: 'carlos-mendoza-rios',
     cargo: 'Asociado Senior',
     categoria: 'asociado',
+    foto_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
     email: 'c.mendoza@bufete.com',
     resumen_corto: 'Asociado senior en el área corporativa, con foco en transacciones de private equity y venture capital.',
     biografia: `Carlos Mendoza forma parte del equipo corporativo desde 2016. Se incorporó al despacho tras pasar tres años en el departamento de M&A de un banco de inversión en Londres.
@@ -481,6 +502,7 @@ Especializado en transacciones de private equity y en la captación de financiac
     slug: 'laura-sanchez-vega',
     cargo: 'Asociada Senior',
     categoria: 'asociado',
+    foto_url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e',
     email: 'l.sanchez@bufete.com',
     resumen_corto: 'Especialista en derecho inmobiliario y urbanismo. Asesora en carteras de activos y proyectos de desarrollo.',
     biografia: `Laura Sánchez se unió al despacho en 2018 y es actualmente asociada senior en el área inmobiliaria. Ha participado en la estructuración y cierre de transacciones de activos inmobiliarios por más de 1.500 millones de euros.
@@ -500,9 +522,9 @@ Su práctica combina el asesoramiento en transacciones con la gestión de confli
 for (const m of miembros) {
   await db.execute({
     sql: `INSERT OR REPLACE INTO miembros
-          (nombre, slug, cargo, categoria, email, resumen_corto, biografia, especialidades, idiomas, educacion, orden, mostrar_en_home)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [m.nombre, m.slug, m.cargo, m.categoria, m.email, m.resumen_corto, m.biografia,
+          (nombre, slug, cargo, categoria, foto_url, email, resumen_corto, biografia, especialidades, idiomas, educacion, orden, mostrar_en_home)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [m.nombre, m.slug, m.cargo, m.categoria, m.foto_url ?? null, m.email, m.resumen_corto, m.biografia,
            m.especialidades, m.idiomas, m.educacion, m.orden, m.mostrar_en_home],
   });
 }
@@ -518,6 +540,8 @@ const articulos = [
     publicado: 1,
     fecha_publicacion: '2024-03-15',
     categorias: JSON.stringify(['Tecnología', 'Regulación']),
+    imagen_url: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01',
+    imagen_alt: 'Inteligencia Artificial — regulación europea',
     extracto: 'El Reglamento Europeo de IA ya es una realidad. Analizamos las obligaciones que impone a las empresas que desarrollan o utilizan sistemas de inteligencia artificial.',
     contenido: `## El Reglamento Europeo de IA: una nueva era regulatoria
 
@@ -555,6 +579,8 @@ La preparación temprana será una ventaja competitiva. Contacte con nuestro equ
     publicado: 1,
     fecha_publicacion: '2024-02-20',
     categorias: JSON.stringify(['Fiscal', 'Internacional']),
+    imagen_url: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f',
+    imagen_alt: 'Fiscalidad internacional y precios de transferencia',
     extracto: 'La reciente reforma del Impuesto sobre Sociedades introduce cambios relevantes en el régimen de operaciones vinculadas y precios de transferencia. Examinamos las principales novedades.',
     contenido: `## Precios de transferencia: el nuevo marco normativo
 
@@ -590,6 +616,8 @@ Nuestro equipo fiscal puede acompañarle en esta revisión y en la negociación 
     publicado: 1,
     fecha_publicacion: '2024-01-10',
     categorias: JSON.stringify(['Litigación', 'Internacional']),
+    imagen_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f',
+    imagen_alt: 'Arbitraje internacional — mazo de tribunal',
     extracto: 'Cuándo conviene incluir una cláusula de arbitraje en un contrato internacional, qué instituciones elegir y cómo redactar la cláusula para evitar problemas futuros.',
     contenido: `## Arbitraje internacional: ventajas, riesgos y buenas prácticas
 
@@ -631,6 +659,8 @@ Antes de firmar un contrato internacional de relevancia, consulte con un especia
     publicado: 1,
     fecha_publicacion: '2023-12-05',
     categorias: JSON.stringify(['Laboral']),
+    imagen_url: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d',
+    imagen_alt: 'Reunión de equipo — derecho laboral',
     extracto: 'La reforma laboral modifica sustancialmente los procedimientos de despido colectivo y suspensión temporal de empleo. Revisamos los aspectos más relevantes para las empresas.',
     contenido: `## EREs y ERTEs: el nuevo marco tras la reforma laboral
 
@@ -666,6 +696,8 @@ La reforma crea el **Mecanismo RED** (Resiliencia, Estabilización y Transición
     publicado: 1,
     fecha_publicacion: '2023-11-18',
     categorias: JSON.stringify(['Corporativo', 'M&A']),
+    imagen_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216',
+    imagen_alt: 'Due diligence en M&A — apretón de manos',
     extracto: 'Una due diligence bien ejecutada es la diferencia entre una buena operación y un problema futuro. Repasamos los focos de riesgo más habituales y cómo gestionarlos.',
     contenido: `## Due diligence en fusiones y adquisiciones: guía para compradores
 
@@ -704,10 +736,10 @@ El informe no es solo un documento de análisis: es la base para negociar las **
 for (const a of articulos) {
   await db.execute({
     sql: `INSERT OR REPLACE INTO articulos
-          (titulo, slug, publicado, fecha_publicacion, categorias, extracto, contenido, seo_titulo, seo_descripcion)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          (titulo, slug, publicado, fecha_publicacion, categorias, imagen_url, imagen_alt, extracto, contenido, seo_titulo, seo_descripcion)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [a.titulo, a.slug, a.publicado, a.fecha_publicacion, a.categorias,
-           a.extracto, a.contenido, a.seo_titulo, a.seo_descripcion],
+           a.imagen_url ?? null, a.imagen_alt ?? null, a.extracto, a.contenido, a.seo_titulo, a.seo_descripcion],
   });
 }
 
@@ -721,6 +753,8 @@ const noticias = [
     slug: 'asesora-operacion-ma-sector-energetico',
     publicado: 1,
     fecha_publicacion: '2024-03-20',
+    imagen_url: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735',
+    imagen_alt: 'Parques eólicos — operación M&A energético',
     extracto: 'Nuestro despacho ha asesorado a un consorcio europeo en la adquisición de una cartera de parques eólicos en España y Portugal por un importe de 1.200 millones de euros.',
     contenido: `Martínez & Asociados ha actuado como asesor legal exclusivo del comprador en la adquisición de una cartera de 15 parques eólicos en operación ubicados en España y Portugal, con una potencia instalada total de 480 MW.
 
@@ -733,6 +767,8 @@ El equipo fue liderado por el socio fundador Nicolás Martínez Vidal, con el ap
     slug: 'reconocido-chambers-europe-2024',
     publicado: 1,
     fecha_publicacion: '2024-02-28',
+    imagen_url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0',
+    imagen_alt: 'Reconocimiento Chambers Europe 2024',
     extracto: 'Chambers and Partners ha reconocido a Martínez & Asociados en su edición 2024, con cuatro socios incluidos en Band 1 de sus respectivas especialidades.',
     contenido: `Martínez & Asociados ha sido reconocido en la edición 2024 de Chambers Europe, la guía de referencia del sector legal, en las siguientes categorías:
 
@@ -750,6 +786,8 @@ Cuatro de los socios del despacho han sido reconocidos individualmente, lo que c
     slug: 'incorporacion-carlos-mendoza-asociado-senior',
     publicado: 1,
     fecha_publicacion: '2024-01-15',
+    imagen_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
+    imagen_alt: 'Carlos Mendoza — nueva incorporación al equipo',
     extracto: 'El despacho refuerza su área de M&A y private equity con la incorporación de Carlos Mendoza, procedente de la banca de inversión en Londres.',
     contenido: `Martínez & Asociados anuncia la incorporación de Carlos Mendoza Ríos como asociado senior en el área corporativa, con foco en transacciones de private equity y financiación de startups tecnológicas.
 
@@ -762,6 +800,8 @@ Carlos Mendoza cuenta con más de ocho años de experiencia en operaciones de M&
     slug: 'javier-ortega-arbitro-icc',
     publicado: 1,
     fecha_publicacion: '2023-12-10',
+    imagen_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f',
+    imagen_alt: 'Árbitro ICC — Javier Ortega Puente',
     extracto: 'El socio Javier Ortega ha sido designado árbitro presidente en un procedimiento ante la Corte Internacional de Arbitraje de la ICC por una disputa contractual en el sector de infraestructuras.',
     contenido: `El socio Javier Ortega Puente ha sido designado árbitro presidente en un procedimiento ante la Corte Internacional de Arbitraje de la Cámara de Comercio Internacional (ICC) por una disputa contractual valorada en aproximadamente 300 millones de euros en el sector de infraestructuras.
 
@@ -774,9 +814,9 @@ Este nombramiento confirma la reputación internacional de Javier Ortega como un
 for (const n of noticias) {
   await db.execute({
     sql: `INSERT OR REPLACE INTO noticias
-          (titulo, slug, publicado, fecha_publicacion, extracto, contenido)
-          VALUES (?, ?, ?, ?, ?, ?)`,
-    args: [n.titulo, n.slug, n.publicado, n.fecha_publicacion, n.extracto, n.contenido],
+          (titulo, slug, publicado, fecha_publicacion, imagen_url, imagen_alt, extracto, contenido)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [n.titulo, n.slug, n.publicado, n.fecha_publicacion, n.imagen_url ?? null, n.imagen_alt ?? null, n.extracto, n.contenido],
   });
 }
 
