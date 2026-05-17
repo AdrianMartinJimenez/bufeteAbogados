@@ -394,7 +394,7 @@ const miembros = [
     slug: 'nicolas-martinez-vidal',
     cargo: 'Socio Fundador',
     categoria: 'socio',
-    foto_url: 'https://images.unsplash.com/photo-1560250097-0dc05ae4be08',
+    foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e',
     email: 'n.martinez@bufete.com',
     resumen_corto: 'Fundador del despacho y referente en derecho corporativo y M&A con más de 25 años de experiencia.',
     biografia: `Nicolás Martínez fundó el despacho en 2003 tras una larga trayectoria en firmas internacionales de primer nivel en Madrid, Londres y Nueva York.
